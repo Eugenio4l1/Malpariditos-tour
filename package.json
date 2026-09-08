@@ -1,13 +1,16 @@
 {
-  "name": "project-name",
+  "name": "malpariditos-tour",
+  "version": "1.0.0",
+  "description": "Proyecto Malparidos Tour",
   "type": "module",
+  "author": "Eugenio",
   "devDependencies": {
-    "servor": "^4.0.2"
+    "servor": "^4.0.2",
+    "gh-pages": "^6.1.1"
   },
   "scripts": {
-    "dev": "servor src/ index.html 1234 --reload"
-  },
-  "dependencies": {
-    "vite": "^8.2.2"
+    "dev": "servor src/ index.html 1234 --reload",
+    "build": "echo 'Build script'",
+    "deploy": "gh-pages -d src"
   }
 }
