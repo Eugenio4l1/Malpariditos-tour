@@ -1,0 +1,13 @@
+{
+  "name": "project-name",
+  "type": "module",
+  "devDependencies": {
+    "servor": "^4.0.2"
+  },
+  "scripts": {
+    "dev": "servor src/ index.html 1234 --reload"
+  },
+  "dependencies": {
+    "vite": "^8.2.2"
+  }
+}
