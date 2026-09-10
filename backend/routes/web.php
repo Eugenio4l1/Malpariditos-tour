@@ -1,6 +1,11 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Models\Tour;
+
+Route::get('/', function () {
+    return view('welcome');
+});
 
 Route::get('/tours-activos', function () {
     return Tour::activos()->get();
