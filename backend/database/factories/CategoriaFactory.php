@@ -10,7 +10,13 @@ class CategoriaFactory extends Factory
     {
         return [
             'nombre' => fake()->randomElement(['Aventura', 'Cultural', 'Playa', 'Naturaleza', 'Gastronómico']),
-            'descripcion' => fake()->sentence(10),
+            'descripcion' => fake()->randomElement([
+                'Experiencias pensadas para quienes buscan adrenalina y contacto con la naturaleza.',
+                'Recorridos que combinan historia, tradición y patrimonio local.',
+                'Ideal para desconectarse frente al mar y disfrutar del paisaje costero.',
+                'Rutas al aire libre entre bosques, ríos y volcanes.',
+                'Una experiencia culinaria que resalta los sabores típicos de la región.',
+            ]),
         ];
     }
 }
