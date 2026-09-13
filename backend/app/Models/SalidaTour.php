@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SalidaTour extends Model
 {
+    use HasFactory;
+
     protected $table = 'salida_tours';
-
     protected $fillable = ['tour_id', 'fecha', 'hora', 'cupo_maximo', 'estado'];
-
-    protected $casts = [
-        'fecha' => 'date',
-    ];
+    protected $casts = ['fecha' => 'date'];
 
     public function tour()
     {
