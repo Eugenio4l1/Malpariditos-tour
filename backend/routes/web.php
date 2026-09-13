@@ -16,3 +16,4 @@ Route::get('/tours-por-categoria', function () {
         ->groupBy('categoria_id')
         ->get();
 });
+
