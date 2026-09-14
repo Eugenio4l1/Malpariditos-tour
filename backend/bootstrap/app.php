@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Exceptions\BusinessRuleException;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -21,16 +22,11 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         // Mapeo genérico para el Lab 4. En el Lab 5 esto se puede refinar
-        // para que cada codigoNegocio() tenga su propio status HTTP.
-        $exceptions->render(function ($e, Request $request) {
-            if (! method_exists($e, 'codigoNegocio') || ! method_exists($e, 'contexto')) {
-                return null;
-            }
-
+        // para que cada getErrorCode() tenga su propio status HTTP.
+        $exceptions->render(function (BusinessRuleException $e, Request $request) {
             return response()->json([
                 'mensaje' => $e->getMessage(),
-                'codigo' => $e->codigoNegocio(),
-                'contexto' => $e->contexto(),
+                'codigo' => $e->getErrorCode(),
             ], 409);
         });
     })->create();
