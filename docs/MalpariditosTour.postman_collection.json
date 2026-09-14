@@ -1,0 +1,633 @@
+{
+  "info": {
+    "_postman_id": "c731b373-4ee0-49f2-a772-e590ecd3213a",
+    "name": "MalpariditosTour",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "57883442",
+    "_collection_link": "https://go.postman.co/collection/57883442-c731b373-4ee0-49f2-a772-e590ecd3213a?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Tours",
+      "item": [
+        {
+          "name": "ListarTours",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/tours",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "tours"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar tours con filtros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/tours?estado=activo&sort_by=precio&sort_dir=asc&per_page=5 ",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "tours"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "activo"
+                },
+                {
+                  "key": "sort_by",
+                  "value": "precio"
+                },
+                {
+                  "key": "sort_dir",
+                  "value": "asc"
+                },
+                {
+                  "key": "per_page",
+                  "value": "5 "
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ver un tour",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/tours/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "tours",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear tour (válido)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/tours?categoria_id=1&nombre=Tour de prueba&precio=120.50&duracion_horas=4&estado=activo",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "tours"
+              ],
+              "query": [
+                {
+                  "key": "categoria_id",
+                  "value": "1"
+                },
+                {
+                  "key": "nombre",
+                  "value": "Tour de prueba"
+                },
+                {
+                  "key": "precio",
+                  "value": "120.50"
+                },
+                {
+                  "key": "duracion_horas",
+                  "value": "4"
+                },
+                {
+                  "key": "estado",
+                  "value": "activo"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear tour (inválido)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/tours",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "tours"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar tour (sin dependencias)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/tours/21",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "tours",
+                "21"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar tour (bloqueado por regla de negocio)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/tours/12",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "tours",
+                "12"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Editar tour",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"precio\": 999 }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/tours/21",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "tours",
+                "21"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reservas",
+      "item": [
+        {
+          "name": "Actualizar reserva (válida, mientras está pendiente)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cantidad_personas\": 3\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/reservas/20",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "reservas",
+                "20"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Regla: SALIDA_TOUR_VENCIDA",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente_id\": 1,\r\n  \"salida_tour_id\": \"\",\r\n  \"cantidad_personas\": 2,\r\n  \"fecha_reserva\": \"2026-09-01\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Regla: CUPO_INSUFICIENTE",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente_id\": 1,\r\n  \"salida_tour_id\": \"1\",\r\n  \"cantidad_personas\": 5,\r\n  \"fecha_reserva\": \"2026-10-01\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/reservas",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "reservas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear reserva (validación: campos vacíos)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/reservas",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "reservas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear reserva (validación: cantidad_personas fuera de rango)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente_id\": 1,\r\n  \"salida_tour_id\": 3,\r\n  \"cantidad_personas\": 25,\r\n  \"fecha_reserva\": \"2026-10-01\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/reservas",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "reservas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear reserva (válida)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cliente_id\": 1,\r\n  \"salida_tour_id\": 3,\r\n  \"cantidad_personas\": 2,\r\n  \"fecha_reserva\": \"2026-10-01\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/reservas",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "reservas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ver una reserva",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/reservas/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "reservas",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar reservas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/reservas",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "reservas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirmar reserva",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/reservas/7/confirmar",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "reservas",
+                "7",
+                "confirmar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Regla: ESTADO_INVALIDO (confirmar dos veces)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/reservas/7/confirmar",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "reservas",
+                "7",
+                "confirmar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Regla: RESERVA_NO_MODIFICABLE",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"cantidad_personas\": 4\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/reservas/7",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "reservas",
+                "7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Regla: RESERVA_CON_DEPENDENCIAS",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/reservas/7",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "reservas",
+                "7"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
