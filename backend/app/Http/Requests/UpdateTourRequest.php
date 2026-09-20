@@ -20,14 +20,38 @@ class UpdateTourRequest extends FormRequest
         $tourId = $this->route('tour');
 
         return [
+            /**
+             * Identificador de la categoría (debe existir).
+             * @example 2
+             */
             'categoria_id' => ['sometimes', 'required', 'integer', 'exists:categorias,id'],
+            /**
+             * Nombre único del tour (3 a 150 caracteres).
+             * @example "Caminata nocturna al volcán"
+             */
             'nombre' => [
                 'sometimes', 'required', 'string', 'min:3', 'max:150',
                 Rule::unique('tours', 'nombre')->ignore($tourId),
             ],
+            /**
+             * Descripción opcional (máximo 2000 caracteres).
+             * @example "Ahora con transporte incluido."
+             */
             'descripcion' => ['nullable', 'string', 'max:2000'],
+            /**
+             * Precio por persona (0 a 999999.99).
+             * @example 52000
+             */
             'precio' => ['sometimes', 'required', 'numeric', 'min:0', 'max:999999.99'],
+            /**
+             * Duración en horas (1 a 24).
+             * @example 5
+             */
             'duracion_horas' => ['sometimes', 'required', 'integer', 'min:1', 'max:24'],
+            /**
+             * Estado comercial del tour.
+             * @example "inactivo"
+             */
             'estado' => ['sometimes', 'required', 'string', 'in:activo,inactivo'],
         ];
     }

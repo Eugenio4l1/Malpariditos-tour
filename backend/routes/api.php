@@ -3,12 +3,11 @@
 use App\Http\Controllers\ClienteReservaController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\ReservaEstadoController;
-use App\Http\Controllers\TourController;
 use App\Http\Controllers\TourSalidaController;
 use Illuminate\Support\Facades\Route;
 
 // Tours: sustantivos en plural, sin verbos en la ruta
-Route::apiResource('tours', TourController::class);
+Route::apiResource('tours', 'App\\Http\\Controllers\\TourController');
 Route::apiResource('tours.salidas', TourSalidaController::class)->only('index');
 
 // Reservas

@@ -17,11 +17,35 @@ class StoreTourRequest extends FormRequest
     public function rules(): array
     {
         return [
+            /**
+             * Identificador de la categoría (debe existir).
+             * @example 1
+             */
             'categoria_id' => ['required', 'integer', 'exists:categorias,id'],
+            /**
+             * Nombre único del tour (3 a 150 caracteres).
+             * @example "Caminata al volcán Rincón de la Vieja"
+             */
             'nombre' => ['required', 'string', 'min:3', 'max:150', 'unique:tours,nombre'],
+            /**
+             * Descripción opcional (máximo 2000 caracteres).
+             * @example "Recorrido guiado de medio día por el parque nacional."
+             */
             'descripcion' => ['nullable', 'string', 'max:2000'],
+            /**
+             * Precio por persona (0 a 999999.99).
+             * @example 45000
+             */
             'precio' => ['required', 'numeric', 'min:0', 'max:999999.99'],
+            /**
+             * Duración en horas (1 a 24).
+             * @example 4
+             */
             'duracion_horas' => ['required', 'integer', 'min:1', 'max:24'],
+            /**
+             * Estado comercial del tour.
+             * @example "activo"
+             */
             'estado' => ['required', 'string', 'in:activo,inactivo'],
         ];
     }

@@ -15,10 +15,16 @@ class StoreReservaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Obligatorio + existencia de clave foránea
+            /**
+             * Identificador del cliente (debe existir).
+             * @example 1
+             */
             'cliente_id' => ['required', 'integer', 'exists:clientes,id'],
 
-            // Obligatorio + existencia de clave foránea + unicidad compuesta
+            /**
+             * Identificador de la salida (debe existir). Un cliente no puede tener dos reservas activas para la misma salida.
+             * @example 3
+             */
             'salida_tour_id' => [
                 'required',
                 'integer',
@@ -29,10 +35,16 @@ class StoreReservaRequest extends FormRequest
                 }),
             ],
 
-            // Rango numérico
+            /**
+             * Cantidad de personas (1 a 20). Desde 5 personas se aplica un 10 % de descuento.
+             * @example 2
+             */
             'cantidad_personas' => ['required', 'integer', 'min:1', 'max:20'],
 
-            // Formato de fecha
+            /**
+             * Fecha de la reserva.
+             * @example "2026-10-15"
+             */
             'fecha_reserva' => ['required', 'date'],
         ];
     }

@@ -10,8 +10,20 @@ class CategoriaResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            /**
+             * Identificador de la categoría.
+             * @example 1
+             */
             'id' => $this->id,
+            /**
+             * Nombre de la categoría.
+             * @example "Aventura"
+             */
             'nombre' => $this->nombre,
+            /**
+             * Descripción opcional.
+             * @example "Rutas al aire libre entre bosques, ríos y volcanes."
+             */
             'descripcion' => $this->descripcion,
         ];
     }

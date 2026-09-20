@@ -17,6 +17,10 @@ class StoreReservaEstadoRequest extends FormRequest
     public function rules(): array
     {
         return [
+            /**
+             * Estado al que pasa la reserva.
+             * @example "confirmada"
+             */
             'estado' => ['required', 'string', 'in:confirmada,cancelada'],
         ];
     }

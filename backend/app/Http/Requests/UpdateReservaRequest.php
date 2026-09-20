@@ -14,7 +14,15 @@ class UpdateReservaRequest extends FormRequest
     public function rules(): array
     {
         return [
+            /**
+             * Nueva cantidad de personas (1 a 20).
+             * @example 4
+             */
             'cantidad_personas' => ['sometimes', 'required', 'integer', 'min:1', 'max:20'],
+            /**
+             * Nueva fecha de la reserva.
+             * @example "2026-10-20"
+             */
             'fecha_reserva' => ['sometimes', 'required', 'date'],
         ];
     }

@@ -1,0 +1,1699 @@
+openapi: 3.1.0
+info:
+  title: 'API de Malpariditos Tour'
+  version: 0.0.1
+  description: |-
+    API REST para gestionar **tours**, sus **salidas** y las **reservas** de los clientes.
+
+    ## Convenciones
+
+    - Rutas orientadas a recursos (sustantivos en plural, sin verbos) y relaciones anidadas.
+    - Todas las respuestas son JSON. Envíe siempre `Accept: application/json`.
+    - Los listados son paginados y devuelven `data`, `links` y `meta` (`current_page`, `last_page`, `per_page`, `total`).
+    - Las creaciones responden `201 Created` con el encabezado `Location`.
+
+    ## Formato único de error
+
+        {"mensaje": "Texto legible", "codigo": "CODIGO_ESTABLE", "errores": {"campo": ["detalle por campo"]}}
+
+    `errores` solo aparece en los `422`. Ninguna respuesta incluye trazas de pila.
+
+    | Código | Cuándo ocurre |
+    |---|---|
+    | 400 | El cuerpo no es un JSON válido |
+    | 404 | El recurso no existe |
+    | 405 | Método no permitido para la ruta |
+    | 409 | Se viola una regla de negocio (cupo, estado, dependencias...) |
+    | 422 | Los datos no pasan la validación |
+    | 500 | Error inesperado (sin detalles internos) |
+servers:
+  -
+    url: 'http://localhost:8000/api'
+tags:
+  -
+    name: Tours
+    description: 'Catálogo de tours turísticos.'
+  -
+    name: Reservas
+    description: 'Reservas de los clientes sobre las salidas de los tours.'
+paths:
+  /tours:
+    get:
+      operationId: tours.index
+      description: |-
+        Devuelve los tours paginados, con filtros combinables y ordenamiento.
+        El tamaño de página tiene un tope de 50 registros.
+      summary: 'Listar tours'
+      tags:
+        - Tours
+      parameters:
+        -
+          name: page
+          in: query
+          description: 'Número de página.'
+          schema:
+            type: integer
+            default: 1
+          example: 2
+        -
+          name: per_page
+          in: query
+          description: 'Registros por página (1 a 50).'
+          schema:
+            type: integer
+            default: 15
+          example: 5
+        -
+          name: sort_by
+          in: query
+          description: 'Campo de orden: `nombre`, `precio`, `duracion_horas` o `created_at`.'
+          schema:
+            type: string
+            default: created_at
+          example: precio
+        -
+          name: sort_dir
+          in: query
+          description: 'Dirección del orden: `asc` o `desc`.'
+          schema:
+            type: string
+            default: desc
+          example: asc
+        -
+          name: categoria_id
+          in: query
+          description: 'Filtra por categoría.'
+          schema:
+            type: integer
+          example: 1
+        -
+          name: estado
+          in: query
+          description: 'Filtra por estado: `activo` o `inactivo`.'
+          schema:
+            type: string
+          example: activo
+        -
+          name: buscar
+          in: query
+          description: 'Texto contenido en el nombre del tour.'
+          schema:
+            type: string
+          example: volcán
+        -
+          name: precio_min
+          in: query
+          description: 'Precio mínimo.'
+          schema:
+            type: object
+          example: 10000
+          x-deepObject-style: qs
+        -
+          name: precio_max
+          in: query
+          description: 'Precio máximo.'
+          schema:
+            type: object
+          example: 90000
+          x-deepObject-style: qs
+      responses:
+        '200':
+          description: 'Paginated set of `TourResource`'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        -
+                          $ref: '#/components/schemas/TourResource'
+                        -
+                          type: object
+                          required:
+                            - categoria
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type:
+                          - string
+                          - 'null'
+                      last:
+                        type:
+                          - string
+                          - 'null'
+                      prev:
+                        type:
+                          - string
+                          - 'null'
+                      next:
+                        type:
+                          - string
+                          - 'null'
+                    required:
+                      - first
+                      - last
+                      - prev
+                      - next
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        minimum: 1
+                      from:
+                        type:
+                          - integer
+                          - 'null'
+                        minimum: 1
+                      last_page:
+                        type: integer
+                        minimum: 1
+                      links:
+                        type: array
+                        description: 'Generated paginator links.'
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type:
+                                - string
+                                - 'null'
+                            label:
+                              type: string
+                            active:
+                              type: boolean
+                          required:
+                            - url
+                            - label
+                            - active
+                      path:
+                        type:
+                          - string
+                          - 'null'
+                        description: 'Base path for paginator generated URLs.'
+                      per_page:
+                        type: integer
+                        description: 'Number of items shown per page.'
+                        minimum: 0
+                      to:
+                        type:
+                          - integer
+                          - 'null'
+                        description: 'Number of the last item in the slice.'
+                        minimum: 1
+                      total:
+                        type: integer
+                        description: 'Total number of items being paginated.'
+                        minimum: 0
+                    required:
+                      - current_page
+                      - from
+                      - last_page
+                      - links
+                      - path
+                      - per_page
+                      - to
+                      - total
+                required:
+                  - data
+                  - links
+                  - meta
+    post:
+      operationId: tours.store
+      description: |-
+        Registra un tour nuevo. Responde `201 Created` con el encabezado `Location`
+        que apunta al recurso creado.
+      summary: 'Crear un tour'
+      tags:
+        - Tours
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreTourRequest'
+      responses:
+        '201':
+          description: 'Tour creado.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TourResource'
+                required:
+                  - data
+          headers:
+            Location:
+              description: 'URL del tour creado, por ejemplo http://localhost:8000/api/tours/21.'
+              schema:
+                type: string
+        '422':
+          description: 'Datos inválidos (`VALIDACION_FALLIDA`). El detalle va por campo en `errores`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                  errores:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+                required:
+                  - mensaje
+                  - codigo
+                  - errores
+        '400':
+          description: 'El cuerpo no es un JSON válido (`SOLICITUD_MALFORMADA`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+  '/tours/{tour}':
+    get:
+      operationId: tours.show
+      description: 'Devuelve el detalle de un tour junto con su categoría.'
+      summary: 'Ver un tour'
+      tags:
+        - Tours
+      parameters:
+        -
+          name: tour
+          in: path
+          required: true
+          description: 'Identificador del tour.'
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: '`TourResource`'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                      -
+                        $ref: '#/components/schemas/TourResource'
+                      -
+                        type: object
+                        required:
+                          - categoria
+                required:
+                  - data
+        '404':
+          description: 'El tour no existe (`RECURSO_NO_ENCONTRADO`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+    patch:
+      operationId: tours.update
+      description: 'Actualización parcial: solo se modifican los campos enviados.'
+      summary: 'Actualizar un tour'
+      tags:
+        - Tours
+      parameters:
+        -
+          name: tour
+          in: path
+          required: true
+          description: 'Identificador del tour.'
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTourRequest'
+      responses:
+        '200':
+          description: '`TourResource`'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TourResource'
+                required:
+                  - data
+        '422':
+          description: 'Datos inválidos (`VALIDACION_FALLIDA`). El detalle va por campo en `errores`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                  errores:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+                required:
+                  - mensaje
+                  - codigo
+                  - errores
+        '400':
+          description: 'El cuerpo no es un JSON válido (`SOLICITUD_MALFORMADA`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+        '404':
+          description: 'El tour no existe (`RECURSO_NO_ENCONTRADO`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+    delete:
+      operationId: tours.destroy
+      description: 'Elimina el tour. No se permite si tiene salidas con reservas pendientes o confirmadas.'
+      summary: 'Eliminar un tour'
+      tags:
+        - Tours
+      parameters:
+        -
+          name: tour
+          in: path
+          required: true
+          description: 'Identificador del tour.'
+          schema:
+            type: integer
+          example: 2
+      responses:
+        '204':
+          description: 'Tour eliminado. La respuesta no tiene cuerpo.'
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: 'El tour no existe (`RECURSO_NO_ENCONTRADO`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+        '409':
+          description: 'El tour tiene reservas activas (`TOUR_CON_DEPENDENCIAS`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+  /reservas:
+    get:
+      operationId: reservas.index
+      description: |-
+        Devuelve las reservas paginadas, con filtros combinables y ordenamiento.
+        El tamaño de página tiene un tope de 50 registros.
+      summary: 'Listar reservas'
+      tags:
+        - Reservas
+      parameters:
+        -
+          name: page
+          in: query
+          description: 'Número de página.'
+          schema:
+            type: integer
+            default: 1
+          example: 2
+        -
+          name: per_page
+          in: query
+          description: 'Registros por página (1 a 50).'
+          schema:
+            type: integer
+            default: 15
+          example: 5
+        -
+          name: sort_by
+          in: query
+          description: 'Campo de orden: `fecha_reserva`, `total`, `cantidad_personas` o `created_at`.'
+          schema:
+            type: string
+            default: fecha_reserva
+          example: total
+        -
+          name: sort_dir
+          in: query
+          description: 'Dirección del orden: `asc` o `desc`.'
+          schema:
+            type: string
+            default: desc
+          example: asc
+        -
+          name: cliente_id
+          in: query
+          description: 'Filtra por cliente.'
+          schema:
+            type: integer
+          example: 1
+        -
+          name: estado
+          in: query
+          description: 'Filtra por estado: `pendiente`, `confirmada` o `cancelada`.'
+          schema:
+            type: string
+          example: pendiente
+        -
+          name: fecha_desde
+          in: query
+          description: 'Reservas con fecha igual o posterior (AAAA-MM-DD).'
+          schema:
+            type: string
+            format: date
+          example: '2026-10-01'
+        -
+          name: fecha_hasta
+          in: query
+          description: 'Reservas con fecha igual o anterior (AAAA-MM-DD).'
+          schema:
+            type: string
+            format: date
+          example: '2026-12-31'
+      responses:
+        '200':
+          description: 'Paginated set of `ReservaResource`'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservaResource'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type:
+                          - string
+                          - 'null'
+                      last:
+                        type:
+                          - string
+                          - 'null'
+                      prev:
+                        type:
+                          - string
+                          - 'null'
+                      next:
+                        type:
+                          - string
+                          - 'null'
+                    required:
+                      - first
+                      - last
+                      - prev
+                      - next
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        minimum: 1
+                      from:
+                        type:
+                          - integer
+                          - 'null'
+                        minimum: 1
+                      last_page:
+                        type: integer
+                        minimum: 1
+                      links:
+                        type: array
+                        description: 'Generated paginator links.'
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type:
+                                - string
+                                - 'null'
+                            label:
+                              type: string
+                            active:
+                              type: boolean
+                          required:
+                            - url
+                            - label
+                            - active
+                      path:
+                        type:
+                          - string
+                          - 'null'
+                        description: 'Base path for paginator generated URLs.'
+                      per_page:
+                        type: integer
+                        description: 'Number of items shown per page.'
+                        minimum: 0
+                      to:
+                        type:
+                          - integer
+                          - 'null'
+                        description: 'Number of the last item in the slice.'
+                        minimum: 1
+                      total:
+                        type: integer
+                        description: 'Total number of items being paginated.'
+                        minimum: 0
+                    required:
+                      - current_page
+                      - from
+                      - last_page
+                      - links
+                      - path
+                      - per_page
+                      - to
+                      - total
+                required:
+                  - data
+                  - links
+                  - meta
+    post:
+      operationId: reservas.store
+      description: |-
+        Registra una reserva en estado `pendiente` y calcula el total (10 % de descuento
+        desde 5 personas). Responde `201 Created` con el encabezado `Location`.
+      summary: 'Crear una reserva'
+      tags:
+        - Reservas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreReservaRequest'
+      responses:
+        '201':
+          description: 'Reserva creada.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ReservaResource'
+                required:
+                  - data
+          headers:
+            Location:
+              description: 'URL de la reserva creada, por ejemplo http://localhost:8000/api/reservas/21.'
+              schema:
+                type: string
+        '422':
+          description: 'Datos inválidos (`VALIDACION_FALLIDA`). El detalle va por campo en `errores`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                  errores:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+                required:
+                  - mensaje
+                  - codigo
+                  - errores
+        '400':
+          description: 'El cuerpo no es un JSON válido (`SOLICITUD_MALFORMADA`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+        '409':
+          description: 'Regla de negocio violada: la salida ya pasó (`SALIDA_TOUR_VENCIDA`) o no hay cupo suficiente (`CUPO_INSUFICIENTE`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+  '/reservas/{reserva}':
+    get:
+      operationId: reservas.show
+      summary: 'Ver una reserva'
+      tags:
+        - Reservas
+      parameters:
+        -
+          name: reserva
+          in: path
+          required: true
+          description: 'Identificador de la reserva.'
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: '`ReservaResource`'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ReservaResource'
+                required:
+                  - data
+        '404':
+          description: 'La reserva no existe (`RECURSO_NO_ENCONTRADO`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+    patch:
+      operationId: reservas.update
+      description: |-
+        Actualización parcial de `cantidad_personas` y `fecha_reserva`. Solo es posible
+        mientras la reserva está `pendiente`. Si cambia la cantidad se recalcula el total.
+      summary: 'Actualizar una reserva'
+      tags:
+        - Reservas
+      parameters:
+        -
+          name: reserva
+          in: path
+          required: true
+          description: 'Identificador de la reserva.'
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReservaRequest'
+      responses:
+        '200':
+          description: '`ReservaResource`'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ReservaResource'
+                required:
+                  - data
+        '422':
+          description: 'Datos inválidos (`VALIDACION_FALLIDA`). El detalle va por campo en `errores`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                  errores:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+                required:
+                  - mensaje
+                  - codigo
+                  - errores
+        '400':
+          description: 'El cuerpo no es un JSON válido (`SOLICITUD_MALFORMADA`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+        '404':
+          description: 'La reserva no existe (`RECURSO_NO_ENCONTRADO`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+        '409':
+          description: 'La reserva no es modificable (`RESERVA_NO_MODIFICABLE`) o no hay cupo suficiente (`CUPO_INSUFICIENTE`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+    delete:
+      operationId: reservas.destroy
+      description: 'No se puede eliminar una reserva confirmada: primero debe cancelarse.'
+      summary: 'Eliminar una reserva'
+      tags:
+        - Reservas
+      parameters:
+        -
+          name: reserva
+          in: path
+          required: true
+          description: 'Identificador de la reserva.'
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '204':
+          description: 'Reserva eliminada. La respuesta no tiene cuerpo.'
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: 'La reserva no existe (`RECURSO_NO_ENCONTRADO`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+        '409':
+          description: 'La reserva está confirmada (`RESERVA_CON_DEPENDENCIAS`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+  '/reservas/{reserva}/estados':
+    post:
+      operationId: reservas.estados.store
+      description: |-
+        El cambio de estado se modela como un sub-recurso (sin verbos en la ruta).
+        Enviar `confirmada` confirma una reserva `pendiente`; enviar `cancelada` cancela
+        una reserva que no esté cancelada. Devuelve la reserva actualizada.
+      summary: 'Cambiar el estado de una reserva'
+      tags:
+        - Reservas
+      parameters:
+        -
+          name: reserva
+          in: path
+          required: true
+          description: 'Identificador de la reserva.'
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreReservaEstadoRequest'
+      responses:
+        '200':
+          description: '`ReservaResource`'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ReservaResource'
+                required:
+                  - data
+        '422':
+          description: 'Estado inválido (`VALIDACION_FALLIDA`). Solo se acepta `confirmada` o `cancelada`.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                  errores:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+                required:
+                  - mensaje
+                  - codigo
+                  - errores
+        '400':
+          description: 'El cuerpo no es un JSON válido (`SOLICITUD_MALFORMADA`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+        '404':
+          description: 'La reserva no existe (`RECURSO_NO_ENCONTRADO`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+        '409':
+          description: 'Transición no permitida (`ESTADO_INVALIDO`): por ejemplo, confirmar una reserva que no está pendiente.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+  '/clientes/{cliente}/reservas':
+    get:
+      operationId: clientes.reservas.index
+      description: |-
+        Recurso anidado: devuelve solo las reservas del cliente indicado.
+        Admite los mismos filtros, orden y paginación que `GET /reservas`.
+      summary: 'Listar las reservas de un cliente'
+      tags:
+        - Reservas
+      parameters:
+        -
+          name: cliente
+          in: path
+          required: true
+          description: 'Identificador del cliente.'
+          schema:
+            type: integer
+          example: 1
+        -
+          name: page
+          in: query
+          description: 'Número de página.'
+          schema:
+            type: integer
+            default: 1
+          example: 2
+        -
+          name: per_page
+          in: query
+          description: 'Registros por página (1 a 50).'
+          schema:
+            type: integer
+            default: 15
+          example: 5
+        -
+          name: estado
+          in: query
+          description: 'Filtra por estado: `pendiente`, `confirmada` o `cancelada`.'
+          schema:
+            type: string
+          example: pendiente
+        -
+          name: sort_by
+          in: query
+          description: 'Campo de orden: `fecha_reserva`, `total`, `cantidad_personas` o `created_at`.'
+          schema:
+            type: string
+            default: fecha_reserva
+          example: total
+        -
+          name: sort_dir
+          in: query
+          description: 'Dirección del orden: `asc` o `desc`.'
+          schema:
+            type: string
+            default: desc
+          example: asc
+      responses:
+        '200':
+          description: 'Paginated set of `ReservaResource`'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservaResource'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type:
+                          - string
+                          - 'null'
+                      last:
+                        type:
+                          - string
+                          - 'null'
+                      prev:
+                        type:
+                          - string
+                          - 'null'
+                      next:
+                        type:
+                          - string
+                          - 'null'
+                    required:
+                      - first
+                      - last
+                      - prev
+                      - next
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        minimum: 1
+                      from:
+                        type:
+                          - integer
+                          - 'null'
+                        minimum: 1
+                      last_page:
+                        type: integer
+                        minimum: 1
+                      links:
+                        type: array
+                        description: 'Generated paginator links.'
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type:
+                                - string
+                                - 'null'
+                            label:
+                              type: string
+                            active:
+                              type: boolean
+                          required:
+                            - url
+                            - label
+                            - active
+                      path:
+                        type:
+                          - string
+                          - 'null'
+                        description: 'Base path for paginator generated URLs.'
+                      per_page:
+                        type: integer
+                        description: 'Number of items shown per page.'
+                        minimum: 0
+                      to:
+                        type:
+                          - integer
+                          - 'null'
+                        description: 'Number of the last item in the slice.'
+                        minimum: 1
+                      total:
+                        type: integer
+                        description: 'Total number of items being paginated.'
+                        minimum: 0
+                    required:
+                      - current_page
+                      - from
+                      - last_page
+                      - links
+                      - path
+                      - per_page
+                      - to
+                      - total
+                required:
+                  - data
+                  - links
+                  - meta
+        '404':
+          description: 'El cliente no existe (`RECURSO_NO_ENCONTRADO`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+  '/tours/{tour}/salidas':
+    get:
+      operationId: tours.salidas.index
+      description: 'Recurso anidado: devuelve solo las salidas del tour indicado, ordenadas por fecha y hora.'
+      summary: 'Listar las salidas de un tour'
+      tags:
+        - Tours
+      parameters:
+        -
+          name: tour
+          in: path
+          required: true
+          description: 'Identificador del tour.'
+          schema:
+            type: integer
+          example: 1
+        -
+          name: page
+          in: query
+          description: 'Número de página.'
+          schema:
+            type: integer
+            default: 1
+          example: 2
+        -
+          name: per_page
+          in: query
+          description: 'Registros por página (1 a 50).'
+          schema:
+            type: integer
+            default: 15
+          example: 5
+      responses:
+        '200':
+          description: 'Paginated set of `SalidaTourResource`'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SalidaTourResource'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type:
+                          - string
+                          - 'null'
+                      last:
+                        type:
+                          - string
+                          - 'null'
+                      prev:
+                        type:
+                          - string
+                          - 'null'
+                      next:
+                        type:
+                          - string
+                          - 'null'
+                    required:
+                      - first
+                      - last
+                      - prev
+                      - next
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        minimum: 1
+                      from:
+                        type:
+                          - integer
+                          - 'null'
+                        minimum: 1
+                      last_page:
+                        type: integer
+                        minimum: 1
+                      links:
+                        type: array
+                        description: 'Generated paginator links.'
+                        items:
+                          type: object
+                          properties:
+                            url:
+                              type:
+                                - string
+                                - 'null'
+                            label:
+                              type: string
+                            active:
+                              type: boolean
+                          required:
+                            - url
+                            - label
+                            - active
+                      path:
+                        type:
+                          - string
+                          - 'null'
+                        description: 'Base path for paginator generated URLs.'
+                      per_page:
+                        type: integer
+                        description: 'Number of items shown per page.'
+                        minimum: 0
+                      to:
+                        type:
+                          - integer
+                          - 'null'
+                        description: 'Number of the last item in the slice.'
+                        minimum: 1
+                      total:
+                        type: integer
+                        description: 'Total number of items being paginated.'
+                        minimum: 0
+                    required:
+                      - current_page
+                      - from
+                      - last_page
+                      - links
+                      - path
+                      - per_page
+                      - to
+                      - total
+                required:
+                  - data
+                  - links
+                  - meta
+        '404':
+          description: 'El tour no existe (`RECURSO_NO_ENCONTRADO`).'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                  codigo:
+                    type: string
+                required:
+                  - mensaje
+                  - codigo
+components:
+  schemas:
+    CategoriaResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 'Identificador de la categoría.'
+          examples:
+            - 1
+        nombre:
+          type: string
+          description: 'Nombre de la categoría.'
+          examples:
+            - Aventura
+        descripcion:
+          type:
+            - string
+            - 'null'
+          description: 'Descripción opcional.'
+          examples:
+            - 'Rutas al aire libre entre bosques, ríos y volcanes.'
+      required:
+        - id
+        - nombre
+        - descripcion
+      title: CategoriaResource
+    ReservaResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 'Identificador de la reserva.'
+          examples:
+            - 7
+        cliente_id:
+          type: integer
+          description: 'Identificador del cliente que reserva.'
+          examples:
+            - 1
+        salida_tour_id:
+          type: integer
+          description: 'Identificador de la salida reservada.'
+          examples:
+            - 3
+        cantidad_personas:
+          type: integer
+          description: 'Cantidad de personas (1 a 20).'
+          examples:
+            - 2
+        fecha_reserva:
+          type: string
+          format: date-time
+          description: 'Fecha en que se registró la reserva.'
+          examples:
+            - '2026-10-15T00:00:00-06:00'
+        estado:
+          type: string
+          description: 'Estado de la reserva.'
+          enum:
+            - pendiente
+            - confirmada
+            - cancelada
+          examples:
+            - pendiente
+        total:
+          type: number
+          description: 'Total calculado (incluye el descuento del 10 % desde 5 personas).'
+          examples:
+            - 90000
+        creado_en:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: 'Fecha de creación.'
+          examples:
+            - '2026-09-20T10:15:00-06:00'
+        actualizado_en:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: 'Fecha de la última actualización.'
+          examples:
+            - '2026-09-20T10:15:00-06:00'
+      required:
+        - id
+        - cliente_id
+        - salida_tour_id
+        - cantidad_personas
+        - fecha_reserva
+        - estado
+        - total
+        - creado_en
+        - actualizado_en
+      title: ReservaResource
+    SalidaTourResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 'Identificador de la salida.'
+          examples:
+            - 3
+        tour_id:
+          type: integer
+          description: 'Identificador del tour al que pertenece.'
+          examples:
+            - 1
+        fecha:
+          type: string
+          format: date
+          description: 'Fecha de la salida.'
+          examples:
+            - '2026-10-15'
+        hora:
+          type: string
+          description: 'Hora de la salida.'
+          examples:
+            - '09:00:00'
+        cupo_maximo:
+          type: integer
+          description: 'Cupo máximo de personas.'
+          examples:
+            - 12
+        estado:
+          type: string
+          description: 'Estado de la salida.'
+          examples:
+            - programada
+      required:
+        - id
+        - tour_id
+        - fecha
+        - hora
+        - cupo_maximo
+        - estado
+      title: SalidaTourResource
+    StoreReservaEstadoRequest:
+      type: object
+      properties:
+        estado:
+          type: string
+          description: 'Estado al que pasa la reserva.'
+          enum:
+            - confirmada
+            - cancelada
+          examples:
+            - confirmada
+      required:
+        - estado
+      title: StoreReservaEstadoRequest
+    StoreReservaRequest:
+      type: object
+      properties:
+        cliente_id:
+          type: integer
+          description: 'Identificador del cliente (debe existir).'
+          examples:
+            - 1
+        salida_tour_id:
+          type: integer
+          description: 'Identificador de la salida (debe existir). Un cliente no puede tener dos reservas activas para la misma salida.'
+          examples:
+            - 3
+        cantidad_personas:
+          type: integer
+          description: 'Cantidad de personas (1 a 20). Desde 5 personas se aplica un 10 % de descuento.'
+          examples:
+            - 2
+          minimum: 1
+          maximum: 20
+        fecha_reserva:
+          type: string
+          format: date-time
+          description: 'Fecha de la reserva.'
+          examples:
+            - '2026-10-15'
+      required:
+        - cliente_id
+        - salida_tour_id
+        - cantidad_personas
+        - fecha_reserva
+      title: StoreReservaRequest
+    StoreTourRequest:
+      type: object
+      properties:
+        categoria_id:
+          type: integer
+          description: 'Identificador de la categoría (debe existir).'
+          examples:
+            - 1
+        nombre:
+          type: string
+          description: 'Nombre único del tour (3 a 150 caracteres).'
+          examples:
+            - 'Caminata al volcán Rincón de la Vieja'
+          minLength: 3
+          maxLength: 150
+        descripcion:
+          type:
+            - string
+            - 'null'
+          description: 'Descripción opcional (máximo 2000 caracteres).'
+          examples:
+            - 'Recorrido guiado de medio día por el parque nacional.'
+          maxLength: 2000
+        precio:
+          type: number
+          description: 'Precio por persona (0 a 999999.99).'
+          examples:
+            - 45000
+          minimum: 0
+          maximum: 999999.99
+        duracion_horas:
+          type: integer
+          description: 'Duración en horas (1 a 24).'
+          examples:
+            - 4
+          minimum: 1
+          maximum: 24
+        estado:
+          type: string
+          description: 'Estado comercial del tour.'
+          enum:
+            - activo
+            - inactivo
+          examples:
+            - activo
+      required:
+        - categoria_id
+        - nombre
+        - precio
+        - duracion_horas
+        - estado
+      title: StoreTourRequest
+    TourResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 'Identificador del tour.'
+          examples:
+            - 12
+        categoria_id:
+          type: integer
+          description: 'Identificador de la categoría a la que pertenece.'
+          examples:
+            - 1
+        nombre:
+          type: string
+          description: 'Nombre único del tour.'
+          examples:
+            - 'Caminata al volcán Rincón de la Vieja'
+        descripcion:
+          type:
+            - string
+            - 'null'
+          description: 'Descripción opcional.'
+          examples:
+            - 'Recorrido guiado de medio día por el parque nacional.'
+        precio:
+          type: number
+          description: 'Precio por persona.'
+          examples:
+            - 45000
+        duracion_horas:
+          type: integer
+          description: 'Duración en horas (1 a 24).'
+          examples:
+            - 4
+        estado:
+          type: string
+          description: 'Estado comercial del tour.'
+          enum:
+            - activo
+            - inactivo
+          examples:
+            - activo
+        categoria:
+          description: 'Categoría del tour. Solo se incluye cuando está cargada (listado y detalle).'
+          $ref: '#/components/schemas/CategoriaResource'
+        creado_en:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: 'Fecha de creación.'
+          examples:
+            - '2026-09-20T10:15:00-06:00'
+        actualizado_en:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: 'Fecha de la última actualización.'
+          examples:
+            - '2026-09-20T10:15:00-06:00'
+      required:
+        - id
+        - categoria_id
+        - nombre
+        - descripcion
+        - precio
+        - duracion_horas
+        - estado
+        - creado_en
+        - actualizado_en
+      title: TourResource
+    UpdateReservaRequest:
+      type: object
+      properties:
+        cantidad_personas:
+          type: integer
+          description: 'Nueva cantidad de personas (1 a 20).'
+          examples:
+            - 4
+          minimum: 1
+          maximum: 20
+        fecha_reserva:
+          type: string
+          format: date-time
+          description: 'Nueva fecha de la reserva.'
+          examples:
+            - '2026-10-20'
+      title: UpdateReservaRequest
+    UpdateTourRequest:
+      type: object
+      properties:
+        categoria_id:
+          type: integer
+          description: 'Identificador de la categoría (debe existir).'
+          examples:
+            - 2
+        nombre:
+          type: string
+          description: 'Nombre único del tour (3 a 150 caracteres).'
+          examples:
+            - 'Caminata nocturna al volcán'
+          minLength: 3
+          maxLength: 150
+        descripcion:
+          type:
+            - string
+            - 'null'
+          description: 'Descripción opcional (máximo 2000 caracteres).'
+          examples:
+            - 'Ahora con transporte incluido.'
+          maxLength: 2000
+        precio:
+          type: number
+          description: 'Precio por persona (0 a 999999.99).'
+          examples:
+            - 52000
+          minimum: 0
+          maximum: 999999.99
+        duracion_horas:
+          type: integer
+          description: 'Duración en horas (1 a 24).'
+          examples:
+            - 5
+          minimum: 1
+          maximum: 24
+        estado:
+          type: string
+          description: 'Estado comercial del tour.'
+          enum:
+            - activo
+            - inactivo
+          examples:
+            - inactivo
+      title: UpdateTourRequest
