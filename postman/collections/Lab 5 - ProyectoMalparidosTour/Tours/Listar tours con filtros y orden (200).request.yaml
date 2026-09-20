@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{base_url}}/tours?per_page=5&sort_by=precio&sort_dir=asc&estado=activo"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  per_page: "5"
+  sort_by: precio
+  sort_dir: asc
+  estado: activo
+order: 2000

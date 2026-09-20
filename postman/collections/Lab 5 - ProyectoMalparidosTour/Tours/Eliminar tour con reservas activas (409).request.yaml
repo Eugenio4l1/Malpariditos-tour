@@ -1,0 +1,7 @@
+$kind: http-request
+description: Requiere que el tour indicado tenga salidas con reservas en estado pendiente o confirmada.
+url: "{{base_url}}/tours/{{tour_id_con_reservas}}"
+method: DELETE
+headers:
+  Accept: application/json
+order: 11000

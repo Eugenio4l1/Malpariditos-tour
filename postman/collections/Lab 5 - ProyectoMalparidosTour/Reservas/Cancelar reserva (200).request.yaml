@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{base_url}}/reservas/{{reserva_id}}/cancelar"
+method: POST
+headers:
+  Accept: application/json
+order: 9000

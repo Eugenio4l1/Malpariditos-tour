@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/tours"
+method: POST
+headers:
+  Accept: application/json
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "descripcion": "Falta categoria_id, nombre, precio, duracion_horas y estado"
+    }
+order: 6000

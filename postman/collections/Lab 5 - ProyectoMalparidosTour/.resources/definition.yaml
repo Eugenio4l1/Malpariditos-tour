@@ -1,0 +1,15 @@
+$kind: collection
+description: "Colección para probar la API REST de Tours y Reservas: casos correctos y de error (200, 201+Location, 204, 404, 409, 422)."
+variables:
+  tour_id: "1"
+  tour_id_con_reservas: "1"
+  tour_id_sin_reservas: "2"
+  reserva_id: "1"
+  reserva_id_confirmada: "2"
+  categoria_id: "1"
+auth:
+  - id: e76ce00d-4d51-4c40-98d9-785cc74c6629
+    type: bearer
+    name: bearer auth
+    credentials:
+      token: "{{token}}"

@@ -1,0 +1,17 @@
+$kind: http-request
+description: Usar el id de una salida_tour cuya fecha ya paso para disparar SALIDA_TOUR_VENCIDA.
+url: "{{base_url}}/reservas"
+method: POST
+headers:
+  Accept: application/json
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "cliente_id": 1,
+      "salida_tour_id": 16,
+      "cantidad_personas": 2,
+      "fecha_reserva": "2026-10-15"
+    }
+order: 6000

@@ -1,0 +1,17 @@
+$kind: http-request
+description: Ajustar salida_tour_id a una salida futura con cupo disponible en los datos sembrados.
+url: "{{base_url}}/reservas"
+method: POST
+headers:
+  Accept: application/json
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "cliente_id": 1,
+      "salida_tour_id": 1,
+      "cantidad_personas": 2,
+      "fecha_reserva": "2026-10-15"
+    }
+order: 4000

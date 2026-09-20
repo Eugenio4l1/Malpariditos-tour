@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{base_url}}/reservas/{{reserva_id}}/confirmar"
+method: POST
+headers:
+  Accept: application/json
+order: 7000

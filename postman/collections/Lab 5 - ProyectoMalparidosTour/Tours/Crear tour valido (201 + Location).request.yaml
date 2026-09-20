@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base_url}}/tours"
+method: POST
+headers:
+  Accept: application/json
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "categoria_id": {{categoria_id}},
+      "nombre": "Tour de prueba Postman {{$randomInt}}",
+      "descripcion": "Creado desde la colección de pruebas",
+      "precio": 45000,
+      "duracion_horas": 4,
+      "estado": "activo"
+    }
+order: 5000

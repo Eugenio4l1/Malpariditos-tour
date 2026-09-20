@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/tours/{{tour_id}}"
+method: PUT
+headers:
+  Accept: application/json
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "precio": 52000,
+      "estado": "activo"
+    }
+order: 8000

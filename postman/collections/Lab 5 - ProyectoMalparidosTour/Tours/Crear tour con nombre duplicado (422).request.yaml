@@ -1,0 +1,18 @@
+$kind: http-request
+description: Reemplazar 'nombre' por el de un tour que ya exista en la base para forzar la violacion de unicidad.
+url: "{{base_url}}/tours"
+method: POST
+headers:
+  Accept: application/json
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "categoria_id": {{categoria_id}},
+      "nombre": "NOMBRE_YA_EXISTENTE_CAMBIAR",
+      "precio": 10000,
+      "duracion_horas": 2,
+      "estado": "activo"
+    }
+order: 7000
