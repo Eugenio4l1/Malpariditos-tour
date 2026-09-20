@@ -20,7 +20,7 @@ class ReservaService
     // Punto 6: listado con paginación, ordenamiento y filtros combinables
     public function list(array $filters): LengthAwarePaginator
     {
-        $perPage = min((int) ($filters['per_page'] ?? 15), self::MAX_PAGE_SIZE);
+        $perPage = max(1, min((int) ($filters['per_page'] ?? 15), self::MAX_PAGE_SIZE));
 
         $sortBy = in_array($filters['sort_by'] ?? '', self::SORTABLE_FIELDS, true)
             ? $filters['sort_by']
@@ -123,6 +123,15 @@ class ReservaService
             $reserva->update(['estado' => 'cancelada']);
             return $reserva->fresh();
         });
+    }
+
+    // Cambio de estado expuesto como sub-recurso: POST /reservas/{reserva}/estados
+    public function cambiarEstado(Reserva $reserva, string $estado): Reserva
+    {
+        return match ($estado) {
+            'confirmada' => $this->confirm($reserva),
+            'cancelada' => $this->cancel($reserva),
+        };
     }
 
     // Punto 4, regla: no eliminar registro con dependencia activa

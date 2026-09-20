@@ -7,7 +7,9 @@ use App\Http\Requests\UpdateReservaRequest;
 use App\Http\Resources\ReservaResource;
 use App\Models\Reserva;
 use App\Services\ReservaService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ReservaController extends Controller
 {
@@ -20,36 +22,30 @@ class ReservaController extends Controller
         return ReservaResource::collection($this->service->list($request->query()));
     }
 
-    public function store(StoreReservaRequest $request)
+    public function store(StoreReservaRequest $request): JsonResponse
     {
         $reserva = $this->service->create($request->validated());
-        return (new ReservaResource($reserva))->response()->setStatusCode(201);
+
+        return (new ReservaResource($reserva))
+            ->response()
+            ->setStatusCode(201)
+            ->header('Location', route('reservas.show', $reserva));
     }
 
-    public function show(Reserva $reserva)
+    public function show(Reserva $reserva): ReservaResource
     {
         return new ReservaResource($reserva);
     }
 
-    public function update(UpdateReservaRequest $request, Reserva $reserva)
+    public function update(UpdateReservaRequest $request, Reserva $reserva): ReservaResource
     {
-        $reserva = $this->service->update($reserva, $request->validated());
-        return new ReservaResource($reserva);
+        return new ReservaResource($this->service->update($reserva, $request->validated()));
     }
 
-    public function destroy(Reserva $reserva)
+    public function destroy(Reserva $reserva): Response
     {
         $this->service->delete($reserva);
-        return response()->json(null, 204);
-    }
 
-    public function confirmar(Reserva $reserva)
-    {
-        return new ReservaResource($this->service->confirm($reserva));
-    }
-
-    public function cancelar(Reserva $reserva)
-    {
-        return new ReservaResource($this->service->cancel($reserva));
+        return response()->noContent();
     }
 }

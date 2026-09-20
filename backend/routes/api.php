@@ -1,13 +1,23 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ClienteReservaController;
 use App\Http\Controllers\ReservaController;
+use App\Http\Controllers\ReservaEstadoController;
 use App\Http\Controllers\TourController;
+use App\Http\Controllers\TourSalidaController;
+use Illuminate\Support\Facades\Route;
 
-// Rutas de Reserva
-Route::apiResource('reservas', ReservaController::class);
-Route::post('reservas/{reserva}/confirmar', [ReservaController::class, 'confirmar']);
-Route::post('reservas/{reserva}/cancelar', [ReservaController::class, 'cancelar']);
-
-// Rutas de Tour
+// Tours: sustantivos en plural, sin verbos en la ruta
 Route::apiResource('tours', TourController::class);
+Route::apiResource('tours.salidas', TourSalidaController::class)->only('index');
+
+// Reservas
+Route::apiResource('reservas', ReservaController::class);
+
+// El cambio de estado se modela como un sub-recurso (antes: /confirmar y /cancelar)
+// POST /api/reservas/{reserva}/estados   { "estado": "confirmada" | "cancelada" }
+Route::post('reservas/{reserva}/estados', [ReservaEstadoController::class, 'store'])
+    ->name('reservas.estados.store');
+
+// Relación cliente -> reservas
+Route::apiResource('clientes.reservas', ClienteReservaController::class)->only('index');

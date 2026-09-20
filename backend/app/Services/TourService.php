@@ -15,7 +15,7 @@ class TourService
     // Punto 6: listado con paginación, ordenamiento y filtros combinables
     public function list(array $filters): LengthAwarePaginator
     {
-        $perPage = min((int) ($filters['per_page'] ?? 15), self::MAX_PAGE_SIZE);
+        $perPage = max(1, min((int) ($filters['per_page'] ?? 15), self::MAX_PAGE_SIZE));
 
         $sortBy = in_array($filters['sort_by'] ?? '', self::SORTABLE_FIELDS, true)
             ? $filters['sort_by']
@@ -41,6 +41,14 @@ class TourService
         }
 
         return $query->orderBy($sortBy, $sortDir)->paginate($perPage);
+    }
+
+    // Relación anidada: GET /tours/{tour}/salidas
+    public function listSalidas(Tour $tour, array $filters): LengthAwarePaginator
+    {
+        $perPage = max(1, min((int) ($filters['per_page'] ?? 15), self::MAX_PAGE_SIZE));
+
+        return $tour->salidaTours()->orderBy('fecha')->orderBy('hora')->paginate($perPage);
     }
 
     public function create(array $data): Tour

@@ -7,7 +7,9 @@ use App\Http\Requests\UpdateTourRequest;
 use App\Http\Resources\TourResource;
 use App\Models\Tour;
 use App\Services\TourService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class TourController extends Controller
 {
@@ -20,29 +22,30 @@ class TourController extends Controller
         return TourResource::collection($this->service->list($request->query()));
     }
 
-    public function store(StoreTourRequest $request)
+    public function store(StoreTourRequest $request): JsonResponse
     {
         $tour = $this->service->create($request->validated());
 
-        return (new TourResource($tour))->response()->setStatusCode(201);
+        return (new TourResource($tour))
+            ->response()
+            ->setStatusCode(201)
+            ->header('Location', route('tours.show', $tour));
     }
 
-    public function show(Tour $tour)
+    public function show(Tour $tour): TourResource
     {
-        return new TourResource($tour);
+        return new TourResource($tour->load('categoria'));
     }
 
-    public function update(UpdateTourRequest $request, Tour $tour)
+    public function update(UpdateTourRequest $request, Tour $tour): TourResource
     {
-        $tour = $this->service->update($tour, $request->validated());
-
-        return new TourResource($tour);
+        return new TourResource($this->service->update($tour, $request->validated()));
     }
 
-    public function destroy(Tour $tour)
+    public function destroy(Tour $tour): Response
     {
         $this->service->delete($tour);
 
-        return response()->json(null, 204);
+        return response()->noContent();
     }
 }
