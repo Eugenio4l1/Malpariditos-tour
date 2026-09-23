@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClienteReservaController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\ReservaEstadoController;
 use App\Http\Controllers\TourSalidaController;
 use Illuminate\Support\Facades\Route;
+
+// Autenticación
+Route::post('register', [AuthController::class, 'register']);
 
 // Tours: sustantivos en plural, sin verbos en la ruta
 Route::apiResource('tours', 'App\\Http\\Controllers\\TourController');
