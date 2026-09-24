@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Route;
 
 // Autenticación
 Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'login'])
+    ->middleware('throttle:login');
 Route::post('logout', [AuthController::class, 'logout'])
     ->middleware('auth:sanctum');
 
