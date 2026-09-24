@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Exceptions\BusinessRuleException;
 use App\Models\Tour;
+use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class TourService
 {
@@ -27,17 +29,21 @@ class TourService
         if (!empty($filters['categoria_id'])) {
             $query->where('categoria_id', $filters['categoria_id']);
         }
+
         if (!empty($filters['estado'])) {
             $query->where('estado', $filters['estado']);
         }
+
         if (!empty($filters['precio_min'])) {
             $query->where('precio', '>=', $filters['precio_min']);
         }
+
         if (!empty($filters['precio_max'])) {
             $query->where('precio', '<=', $filters['precio_max']);
         }
+
         if (!empty($filters['buscar'])) {
-            $query->where('nombre', 'like', '%'.$filters['buscar'].'%');
+            $query->where('nombre', 'like', '%' . $filters['buscar'] . '%');
         }
 
         return $query->orderBy($sortBy, $sortDir)->paginate($perPage);
@@ -48,27 +54,45 @@ class TourService
     {
         $perPage = max(1, min((int) ($filters['per_page'] ?? 15), self::MAX_PAGE_SIZE));
 
-        return $tour->salidaTours()->orderBy('fecha')->orderBy('hora')->paginate($perPage);
+        return $tour->salidaTours()
+            ->orderBy('fecha')
+            ->orderBy('hora')
+            ->paginate($perPage);
     }
 
-    public function create(array $data): Tour
+    public function create(?User $user, array $data): Tour
     {
+        $user = $this->usuarioAutenticado($user);
+
+        Gate::forUser($user)->authorize('create', Tour::class);
+
         return Tour::create($data);
     }
 
-    public function update(Tour $tour, array $data): Tour
+    public function update(?User $user, Tour $tour, array $data): Tour
     {
+        $user = $this->usuarioAutenticado($user);
+
+        Gate::forUser($user)->authorize('update', $tour);
+
         $tour->update($data);
 
         return $tour->fresh('categoria');
     }
 
     // Punto 4, regla: no eliminar registro con dependencia activa
-    public function delete(Tour $tour): void
+    public function delete(?User $user, Tour $tour): void
     {
+        $user = $this->usuarioAutenticado($user);
+
+        Gate::forUser($user)->authorize('delete', $tour);
+
         DB::transaction(function () use ($tour) {
             $tieneReservasActivas = $tour->salidaTours()
-                ->whereHas('reservas', fn ($q) => $q->whereIn('estado', ['pendiente', 'confirmada']))
+                ->whereHas(
+                    'reservas',
+                    fn ($q) => $q->whereIn('estado', ['pendiente', 'confirmada'])
+                )
                 ->exists();
 
             if ($tieneReservasActivas) {
@@ -80,5 +104,16 @@ class TourService
 
             $tour->delete();
         });
+    }
+
+    private function usuarioAutenticado(?User $user): User
+    {
+        if (!$user) {
+            throw new \Illuminate\Auth\AuthenticationException(
+                'Debes autenticarte para realizar esta operación.'
+            );
+        }
+
+        return $user;
     }
 }

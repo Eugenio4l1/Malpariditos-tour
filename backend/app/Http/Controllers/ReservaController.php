@@ -46,21 +46,12 @@ class ReservaController extends Controller
     #[QueryParameter('fecha_hasta', description: 'Reservas con fecha igual o anterior (AAAA-MM-DD).', type: 'string', format: 'date', example: '2026-12-31')]
     public function index(Request $request)
     {
-        $filtros = $request->query();
-
-        if ($request->user()->role === 'cliente') {
-            $cliente = $request->user()->cliente;
-
-            if (!$cliente) {
-                throw new AuthorizationException(
-                    'El usuario autenticado no tiene un cliente asociado.'
-                );
-            }
-
-            $filtros['cliente_id'] = $cliente->id;
-        }
-
-        return ReservaResource::collection($this->service->list($filtros));
+        return ReservaResource::collection(
+            $this->service->list(
+                $request->user(),
+                $request->query()
+            )
+        );
     }
 
     /**
@@ -77,6 +68,8 @@ class ReservaController extends Controller
     #[ApiResponse(422, 'Datos inválidos (`VALIDACION_FALLIDA`). El detalle va por campo en `errores`.', type: ApiDocs::ERROR_VALIDACION)]
     public function store(StoreReservaRequest $request): JsonResponse
     {
+        Gate::authorize('create', Reserva::class);
+
         $data = $request->validated();
 
         if ($request->user()->role === 'cliente') {
@@ -92,7 +85,10 @@ class ReservaController extends Controller
             $data['cliente_id'] = $cliente->id;
         }
 
-        $reserva = $this->service->create($data);
+        $reserva = $this->service->create(
+            $request->user(),
+            $data
+        );
 
         /**
          * Reserva creada.
@@ -137,7 +133,11 @@ class ReservaController extends Controller
         Gate::authorize('update', $reserva);
 
         return new ReservaResource(
-            $this->service->update($reserva, $request->validated())
+            $this->service->update(
+                $request->user(),
+                $reserva,
+                $request->validated()
+            )
         );
     }
 
@@ -155,7 +155,10 @@ class ReservaController extends Controller
     {
         Gate::authorize('delete', $reserva);
 
-        $this->service->delete($reserva);
+        $this->service->delete(
+            request()->user(),
+            $reserva
+        );
 
         return response()->noContent();
     }

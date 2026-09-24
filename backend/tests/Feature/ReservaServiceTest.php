@@ -6,6 +6,7 @@ use App\Exceptions\BusinessRuleException;
 use App\Models\Cliente;
 use App\Models\SalidaTour;
 use App\Models\Tour;
+use App\Models\User;
 use App\Services\ReservaService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,6 +21,19 @@ class ReservaServiceTest extends TestCase
     {
         parent::setUp();
         $this->service = app(ReservaService::class);
+    }
+
+    private function crearUsuarioCliente(): User
+    {
+        $user = User::factory()->create([
+            'role' => 'cliente',
+        ]);
+
+        Cliente::factory()->create([
+            'email' => $user->email,
+        ]);
+
+        return $user;
     }
 
     private function crearSalida(array $overrides = []): SalidaTour
@@ -38,13 +52,15 @@ class ReservaServiceTest extends TestCase
     // Regla 1: no reservar una salida ya vencida
     public function test_no_permite_reservar_salida_de_tour_vencida(): void
     {
-        $cliente = Cliente::factory()->create();
-        $salida = $this->crearSalida(['fecha' => now()->subDay()->toDateString()]);
+        $user = $this->crearUsuarioCliente();
+        $salida = $this->crearSalida([
+            'fecha' => now()->subDay()->toDateString(),
+        ]);
 
         $this->expectException(BusinessRuleException::class);
 
-        $this->service->create([
-            'cliente_id' => $cliente->id,
+        $this->service->create($user, [
+            'cliente_id' => $user->cliente->id,
             'salida_tour_id' => $salida->id,
             'cantidad_personas' => 2,
             'fecha_reserva' => now(),
@@ -54,13 +70,15 @@ class ReservaServiceTest extends TestCase
     // Regla 2: no reservar sin cupo disponible suficiente
     public function test_no_permite_reservar_sin_cupo_disponible_suficiente(): void
     {
-        $cliente = Cliente::factory()->create();
-        $salida = $this->crearSalida(['cupo_maximo' => 2]);
+        $user = $this->crearUsuarioCliente();
+        $salida = $this->crearSalida([
+            'cupo_maximo' => 2,
+        ]);
 
         $this->expectException(BusinessRuleException::class);
 
-        $this->service->create([
-            'cliente_id' => $cliente->id,
+        $this->service->create($user, [
+            'cliente_id' => $user->cliente->id,
             'salida_tour_id' => $salida->id,
             'cantidad_personas' => 3,
             'fecha_reserva' => now(),
@@ -70,11 +88,11 @@ class ReservaServiceTest extends TestCase
     // Regla 3: descuento por umbral de personas >w<
     public function test_aplica_descuento_por_umbral_de_personas(): void
     {
-        $cliente = Cliente::factory()->create();
+        $user = $this->crearUsuarioCliente();
         $salida = $this->crearSalida();
 
-        $reserva = $this->service->create([
-            'cliente_id' => $cliente->id,
+        $reserva = $this->service->create($user, [
+            'cliente_id' => $user->cliente->id,
             'salida_tour_id' => $salida->id,
             'cantidad_personas' => 5,
             'fecha_reserva' => now(),
@@ -84,40 +102,45 @@ class ReservaServiceTest extends TestCase
     }
 
     // Regla 4: no eliminar una reserva confirmada (dependencia activa)
-    public function test_no_permite_eliminar_una_reserva_confirmada(): void
-    {
-        $cliente = Cliente::factory()->create();
-        $salida = $this->crearSalida();
+   public function test_no_permite_eliminar_una_reserva_confirmada(): void
+{
+    $user = $this->crearUsuarioCliente();
+    $salida = $this->crearSalida();
 
-        $reserva = $this->service->create([
-            'cliente_id' => $cliente->id,
-            'salida_tour_id' => $salida->id,
-            'cantidad_personas' => 2,
-            'fecha_reserva' => now(),
-        ]);
+    $reserva = $this->service->create($user, [
+        'cliente_id' => $user->cliente->id,
+        'salida_tour_id' => $salida->id,
+        'cantidad_personas' => 2,
+        'fecha_reserva' => now(),
+    ]);
 
-        $this->service->confirm($reserva);
+    $guia = User::factory()->create([
+        'role' => 'guia',
+    ]);
 
-        $this->expectException(BusinessRuleException::class);
+    $this->service->confirm($guia, $reserva);
 
-        $this->service->delete($reserva);
-    }
+    $this->expectException(BusinessRuleException::class);
 
+    $this->service->delete($user, $reserva);
+}
     // Punto 5: verificación de que un fallo intermedio no deja registros parciales
     public function test_falla_intermedia_no_deja_registros_parciales(): void
     {
-        $cliente = Cliente::factory()->create();
-        $salida = $this->crearSalida(['cupo_maximo' => 1]);
+        $user = $this->crearUsuarioCliente();
+        $salida = $this->crearSalida([
+            'cupo_maximo' => 1,
+        ]);
 
         try {
-            $this->service->create([
-                'cliente_id' => $cliente->id,
+            $this->service->create($user, [
+                'cliente_id' => $user->cliente->id,
                 'salida_tour_id' => $salida->id,
                 'cantidad_personas' => 5,
                 'fecha_reserva' => now(),
             ]);
         } catch (BusinessRuleException) {
-            // No hacer nada, se espera que falle unu
+            // No hacer nada, se espera que falle
         }
 
         $this->assertDatabaseCount('reservas', 0);

@@ -8,6 +8,7 @@ use App\Models\Cliente;
 use App\Models\Reserva;
 use App\Models\SalidaTour;
 use App\Models\Tour;
+use App\Models\User;
 use App\Services\TourService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -24,12 +25,20 @@ class TourServiceTest extends TestCase
         $this->service = app(TourService::class);
     }
 
+    private function crearUsuarioAdmin(): User
+    {
+        return User::factory()->create([
+            'role' => 'admin',
+        ]);
+    }
+
     // CRUD: crear
     public function test_crea_un_tour(): void
     {
+        $user = $this->crearUsuarioAdmin();
         $categoria = Categoria::factory()->create();
 
-        $tour = $this->service->create([
+        $tour = $this->service->create($user, [
             'categoria_id' => $categoria->id,
             'nombre' => 'Tour de prueba',
             'descripcion' => 'Descripción de prueba',
@@ -38,36 +47,56 @@ class TourServiceTest extends TestCase
             'estado' => 'activo',
         ]);
 
-        $this->assertDatabaseHas('tours', ['nombre' => 'Tour de prueba']);
+        $this->assertDatabaseHas('tours', [
+            'nombre' => 'Tour de prueba',
+        ]);
+
         $this->assertEquals('activo', $tour->estado);
     }
 
     // CRUD: actualizar
     public function test_actualiza_un_tour(): void
     {
-        $tour = Tour::factory()->create(['precio' => 100]);
+        $user = $this->crearUsuarioAdmin();
+        $tour = Tour::factory()->create([
+            'precio' => 100,
+        ]);
 
-        $actualizado = $this->service->update($tour, ['precio' => 200]);
+        $actualizado = $this->service->update(
+            $user,
+            $tour,
+            ['precio' => 200]
+        );
 
         $this->assertEquals(200, (float) $actualizado->precio);
-        $this->assertDatabaseHas('tours', ['id' => $tour->id, 'precio' => 200]);
+
+        $this->assertDatabaseHas('tours', [
+            'id' => $tour->id,
+            'precio' => 200,
+        ]);
     }
 
     // CRUD: eliminar sin dependencias (camino feliz)
     public function test_elimina_un_tour_sin_dependencias(): void
     {
+        $user = $this->crearUsuarioAdmin();
         $tour = Tour::factory()->create();
 
-        $this->service->delete($tour);
+        $this->service->delete($user, $tour);
 
-        $this->assertDatabaseMissing('tours', ['id' => $tour->id]);
+        $this->assertDatabaseMissing('tours', [
+            'id' => $tour->id,
+        ]);
     }
 
     // Regla de negocio: no eliminar un tour con salidas que tienen reservas activas
     public function test_no_permite_eliminar_un_tour_con_dependencias_activas(): void
     {
+        $user = $this->crearUsuarioAdmin();
         $tour = Tour::factory()->create();
-        $salida = SalidaTour::factory()->create(['tour_id' => $tour->id]);
+        $salida = SalidaTour::factory()->create([
+            'tour_id' => $tour->id,
+        ]);
         $cliente = Cliente::factory()->create();
 
         Reserva::factory()->create([
@@ -78,17 +107,22 @@ class TourServiceTest extends TestCase
 
         $this->expectException(BusinessRuleException::class);
 
-        $this->service->delete($tour);
+        $this->service->delete($user, $tour);
 
         // El tour no debe haberse borrado
-        $this->assertDatabaseHas('tours', ['id' => $tour->id]);
+        $this->assertDatabaseHas('tours', [
+            'id' => $tour->id,
+        ]);
     }
 
     // Regla de negocio: una reserva cancelada NO cuenta como dependencia activa
     public function test_permite_eliminar_un_tour_cuyas_reservas_estan_canceladas(): void
     {
+        $user = $this->crearUsuarioAdmin();
         $tour = Tour::factory()->create();
-        $salida = SalidaTour::factory()->create(['tour_id' => $tour->id]);
+        $salida = SalidaTour::factory()->create([
+            'tour_id' => $tour->id,
+        ]);
         $cliente = Cliente::factory()->create();
 
         Reserva::factory()->create([
@@ -97,18 +131,27 @@ class TourServiceTest extends TestCase
             'estado' => 'cancelada',
         ]);
 
-        $this->service->delete($tour);
+        $this->service->delete($user, $tour);
 
-        $this->assertDatabaseMissing('tours', ['id' => $tour->id]);
+        $this->assertDatabaseMissing('tours', [
+            'id' => $tour->id,
+        ]);
     }
 
     // Listado: filtro por estado
     public function test_lista_tours_filtrando_por_estado(): void
     {
-        Tour::factory()->count(3)->create(['estado' => 'activo']);
-        Tour::factory()->count(2)->create(['estado' => 'inactivo']);
+        Tour::factory()->count(3)->create([
+            'estado' => 'activo',
+        ]);
 
-        $resultado = $this->service->list(['estado' => 'activo']);
+        Tour::factory()->count(2)->create([
+            'estado' => 'inactivo',
+        ]);
+
+        $resultado = $this->service->list([
+            'estado' => 'activo',
+        ]);
 
         $this->assertEquals(3, $resultado->total());
     }
@@ -118,10 +161,24 @@ class TourServiceTest extends TestCase
     {
         $categoria = Categoria::factory()->create();
 
-        Tour::factory()->create(['categoria_id' => $categoria->id, 'precio' => 50]);
-        Tour::factory()->create(['categoria_id' => $categoria->id, 'precio' => 150]);
-        Tour::factory()->create(['categoria_id' => $categoria->id, 'precio' => 500]);
-        Tour::factory()->create(['precio' => 150]); // otra categoría, no debe salir
+        Tour::factory()->create([
+            'categoria_id' => $categoria->id,
+            'precio' => 50,
+        ]);
+
+        Tour::factory()->create([
+            'categoria_id' => $categoria->id,
+            'precio' => 150,
+        ]);
+
+        Tour::factory()->create([
+            'categoria_id' => $categoria->id,
+            'precio' => 500,
+        ]);
+
+        Tour::factory()->create([
+            'precio' => 150,
+        ]);
 
         $resultado = $this->service->list([
             'categoria_id' => $categoria->id,
@@ -135,11 +192,25 @@ class TourServiceTest extends TestCase
     // Listado: ordenamiento por precio ascendente
     public function test_lista_tours_ordenados_por_precio_ascendente(): void
     {
-        Tour::factory()->create(['nombre' => 'Caro', 'precio' => 300]);
-        Tour::factory()->create(['nombre' => 'Barato', 'precio' => 50]);
-        Tour::factory()->create(['nombre' => 'Medio', 'precio' => 150]);
+        Tour::factory()->create([
+            'nombre' => 'Caro',
+            'precio' => 300,
+        ]);
 
-        $resultado = $this->service->list(['sort_by' => 'precio', 'sort_dir' => 'asc']);
+        Tour::factory()->create([
+            'nombre' => 'Barato',
+            'precio' => 50,
+        ]);
+
+        Tour::factory()->create([
+            'nombre' => 'Medio',
+            'precio' => 150,
+        ]);
+
+        $resultado = $this->service->list([
+            'sort_by' => 'precio',
+            'sort_dir' => 'asc',
+        ]);
 
         $this->assertEquals('Barato', $resultado->items()[0]->nombre);
         $this->assertEquals('Caro', $resultado->items()[2]->nombre);
@@ -150,7 +221,9 @@ class TourServiceTest extends TestCase
     {
         Tour::factory()->count(60)->create();
 
-        $resultado = $this->service->list(['per_page' => 1000]);
+        $resultado = $this->service->list([
+            'per_page' => 1000,
+        ]);
 
         $this->assertEquals(50, $resultado->perPage());
     }

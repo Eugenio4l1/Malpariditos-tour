@@ -44,6 +44,11 @@ class ClienteReservaController extends Controller
             'cliente_id' => $cliente->id,
         ]);
 
-        return ReservaResource::collection($this->service->list($filtros));
+        return ReservaResource::collection(
+            $this->service->list(
+                $request->user(),
+                $filtros
+            )
+        );
     }
 }

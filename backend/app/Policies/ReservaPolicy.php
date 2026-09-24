@@ -11,6 +11,15 @@ class ReservaPolicy
      * Los administradores y guías pueden consultar cualquier reserva.
      * Un cliente solo puede consultar sus propias reservas.
      */
+    public function viewAny(User $user): bool
+    {
+        return in_array($user->role, ['admin', 'guia', 'cliente'], true);
+    }
+
+    /**
+     * Los administradores y guías pueden consultar cualquier reserva.
+     * Un cliente solo puede consultar sus propias reservas.
+     */
     public function view(User $user, Reserva $reserva): bool
     {
         if (in_array($user->role, ['admin', 'guia'], true)) {
@@ -19,6 +28,15 @@ class ReservaPolicy
 
         return $user->role === 'cliente'
             && $user->cliente?->id === $reserva->cliente_id;
+    }
+
+    /**
+     * Crear reservas requiere un usuario con rol de cliente.
+     */
+    public function create(User $user): bool
+    {
+        return $user->role === 'cliente'
+            && $user->cliente !== null;
     }
 
     /**

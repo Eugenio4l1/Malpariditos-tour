@@ -5,9 +5,12 @@ namespace App\Services;
 use App\Exceptions\BusinessRuleException;
 use App\Models\Reserva;
 use App\Models\SalidaTour;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class ReservaService
 {
@@ -18,8 +21,12 @@ class ReservaService
     private const ESTADOS_ACTIVOS = ['pendiente', 'confirmada'];
 
     // Punto 6: listado con paginación, ordenamiento y filtros combinables
-    public function list(array $filters): LengthAwarePaginator
+    public function list(?User $user, array $filters): LengthAwarePaginator
     {
+        $user = $this->usuarioAutenticado($user);
+
+        Gate::forUser($user)->authorize('viewAny', Reserva::class);
+
         $perPage = max(1, min((int) ($filters['per_page'] ?? 15), self::MAX_PAGE_SIZE));
 
         $sortBy = in_array($filters['sort_by'] ?? '', self::SORTABLE_FIELDS, true)
@@ -29,15 +36,26 @@ class ReservaService
 
         $query = Reserva::query();
 
-        if (!empty($filters['cliente_id'])) {
+        if ($user->role === 'cliente') {
+            $cliente = $user->cliente;
+
+            if (!$cliente) {
+                abort(403, 'El usuario autenticado no tiene un cliente asociado.');
+            }
+
+            $query->where('cliente_id', $cliente->id);
+        } elseif (!empty($filters['cliente_id'])) {
             $query->where('cliente_id', $filters['cliente_id']);
         }
+
         if (!empty($filters['estado'])) {
             $query->where('estado', $filters['estado']);
         }
+
         if (!empty($filters['fecha_desde'])) {
             $query->whereDate('fecha_reserva', '>=', $filters['fecha_desde']);
         }
+
         if (!empty($filters['fecha_hasta'])) {
             $query->whereDate('fecha_reserva', '<=', $filters['fecha_hasta']);
         }
@@ -46,8 +64,21 @@ class ReservaService
     }
 
     // Punto 5: transacción con lock; Punto 4: reglas 1 y 3
-    public function create(array $data): Reserva
+    public function create(?User $user, array $data): Reserva
     {
+        $user = $this->usuarioAutenticado($user);
+
+        Gate::forUser($user)->authorize('create', Reserva::class);
+
+        $cliente = $user->cliente;
+
+        if (!$cliente) {
+            abort(403, 'El usuario autenticado no tiene un cliente asociado.');
+        }
+
+        // El Service también impone la propiedad de la reserva.
+        $data['cliente_id'] = $cliente->id;
+
         return DB::transaction(function () use ($data) {
             /** @var SalidaTour $salida */
             $salida = SalidaTour::with('tour')
@@ -57,7 +88,10 @@ class ReservaService
             $this->verificarSalidaVigente($salida);
             $this->verificarCupoDisponible($salida, $data['cantidad_personas']);
 
-            $total = $this->calcularTotal($salida->tour->precio, $data['cantidad_personas']);
+            $total = $this->calcularTotal(
+                $salida->tour->precio,
+                $data['cantidad_personas']
+            );
 
             return Reserva::create([
                 'cliente_id' => $data['cliente_id'],
@@ -70,8 +104,12 @@ class ReservaService
         });
     }
 
-    public function update(Reserva $reserva, array $data): Reserva
+    public function update(?User $user, Reserva $reserva, array $data): Reserva
     {
+        $user = $this->usuarioAutenticado($user);
+
+        Gate::forUser($user)->authorize('update', $reserva);
+
         return DB::transaction(function () use ($reserva, $data) {
             if (in_array($reserva->estado, ['confirmada', 'cancelada'], true)) {
                 throw new BusinessRuleException(
@@ -85,8 +123,16 @@ class ReservaService
                     ->lockForUpdate()
                     ->findOrFail($reserva->salida_tour_id);
 
-                $this->verificarCupoDisponible($salida, $data['cantidad_personas'], excluirReservaId: $reserva->id);
-                $data['total'] = $this->calcularTotal($salida->tour->precio, $data['cantidad_personas']);
+                $this->verificarCupoDisponible(
+                    $salida,
+                    $data['cantidad_personas'],
+                    excluirReservaId: $reserva->id
+                );
+
+                $data['total'] = $this->calcularTotal(
+                    $salida->tour->precio,
+                    $data['cantidad_personas']
+                );
             }
 
             $reserva->update($data);
@@ -96,8 +142,12 @@ class ReservaService
     }
 
     // Punto 4, regla: no se puede confirmar si no está pendiente
-    public function confirm(Reserva $reserva): Reserva
+    public function confirm(?User $user, Reserva $reserva): Reserva
     {
+        $user = $this->usuarioAutenticado($user);
+
+        Gate::forUser($user)->authorize('changeState', $reserva);
+
         if ($reserva->estado !== 'pendiente') {
             throw new BusinessRuleException(
                 'Solo se pueden confirmar reservas en estado pendiente.',
@@ -110,8 +160,12 @@ class ReservaService
         return $reserva;
     }
 
-    public function cancel(Reserva $reserva): Reserva
+    public function cancel(?User $user, Reserva $reserva): Reserva
     {
+        $user = $this->usuarioAutenticado($user);
+
+        Gate::forUser($user)->authorize('changeState', $reserva);
+
         if ($reserva->estado === 'cancelada') {
             throw new BusinessRuleException(
                 'La reserva ya se encuentra cancelada.',
@@ -121,22 +175,35 @@ class ReservaService
 
         return DB::transaction(function () use ($reserva) {
             $reserva->update(['estado' => 'cancelada']);
+
             return $reserva->fresh();
         });
     }
 
     // Cambio de estado expuesto como sub-recurso: POST /reservas/{reserva}/estados
-    public function cambiarEstado(Reserva $reserva, string $estado): Reserva
+    public function cambiarEstado(?User $user, Reserva $reserva, string $estado): Reserva
     {
+        $user = $this->usuarioAutenticado($user);
+
+        Gate::forUser($user)->authorize('changeState', $reserva);
+
         return match ($estado) {
-            'confirmada' => $this->confirm($reserva),
-            'cancelada' => $this->cancel($reserva),
+            'confirmada' => $this->confirm($user, $reserva),
+            'cancelada' => $this->cancel($user, $reserva),
+            default => throw new BusinessRuleException(
+                'El estado proporcionado no es válido.',
+                'ESTADO_INVALIDO'
+            ),
         };
     }
 
     // Punto 4, regla: no eliminar registro con dependencia activa
-    public function delete(Reserva $reserva): void
+    public function delete(?User $user, Reserva $reserva): void
     {
+        $user = $this->usuarioAutenticado($user);
+
+        Gate::forUser($user)->authorize('delete', $reserva);
+
         if ($reserva->estado === 'confirmada') {
             throw new BusinessRuleException(
                 'No se puede eliminar una reserva confirmada.',
@@ -150,7 +217,9 @@ class ReservaService
     // Punto 4, regla propia del dominio: no reservar una salida ya vencida
     private function verificarSalidaVigente(SalidaTour $salida): void
     {
-        $fechaHoraSalida = Carbon::parse($salida->fecha->format('Y-m-d') . ' ' . $salida->hora);
+        $fechaHoraSalida = Carbon::parse(
+            $salida->fecha->format('Y-m-d') . ' ' . $salida->hora
+        );
 
         if ($fechaHoraSalida->isPast()) {
             throw new BusinessRuleException(
@@ -161,8 +230,11 @@ class ReservaService
     }
 
     // Punto 4, regla: no exceder el cupo disponible (calculado dinámicamente)
-    private function verificarCupoDisponible(SalidaTour $salida, int $cantidadSolicitada, ?int $excluirReservaId = null): void
-    {
+    private function verificarCupoDisponible(
+        SalidaTour $salida,
+        int $cantidadSolicitada,
+        ?int $excluirReservaId = null
+    ): void {
         $query = Reserva::where('salida_tour_id', $salida->id)
             ->whereIn('estado', self::ESTADOS_ACTIVOS);
 
@@ -191,5 +263,16 @@ class ReservaService
         }
 
         return round($total, 2);
+    }
+
+    private function usuarioAutenticado(?User $user): User
+    {
+        if (!$user) {
+            throw new AuthenticationException(
+                'Debes autenticarte para realizar esta operación.'
+            );
+        }
+
+        return $user;
     }
 }
