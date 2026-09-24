@@ -7,6 +7,7 @@ use App\Models\Cliente;
 use App\Models\Reserva;
 use App\Models\SalidaTour;
 use App\Models\Tour;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
@@ -15,10 +16,30 @@ class ApiRestTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Crea un usuario de prueba con el rol indicado.
+     */
+    private function usuarioConRol(string $rol): User
+    {
+        return User::factory()->create([
+            'role' => $rol,
+        ]);
+    }
+
+    /**
+     * Autentica las siguientes peticiones como un usuario del rol indicado.
+     */
+    private function autenticarComo(string $rol): void
+    {
+        $this->actingAs($this->usuarioConRol($rol), 'sanctum');
+    }
+
     // ---------- 201 + Location ----------
 
     public function test_crear_tour_devuelve_201_con_location(): void
     {
+        $this->autenticarComo('admin');
+
         $categoria = Categoria::factory()->create();
 
         $respuesta = $this->postJson('/api/tours', [
@@ -36,6 +57,8 @@ class ApiRestTest extends TestCase
 
     public function test_crear_reserva_devuelve_201_con_location(): void
     {
+        $this->autenticarComo('cliente');
+
         $cliente = Cliente::factory()->create();
         $salida = SalidaTour::factory()->create(['cupo_maximo' => 10]);
 
@@ -55,6 +78,8 @@ class ApiRestTest extends TestCase
 
     public function test_eliminar_tour_sin_dependencias_devuelve_204(): void
     {
+        $this->autenticarComo('admin');
+
         $tour = Tour::factory()->create();
 
         $this->deleteJson("/api/tours/{$tour->id}")->assertNoContent();
@@ -63,6 +88,8 @@ class ApiRestTest extends TestCase
 
     public function test_eliminar_reserva_confirmada_devuelve_409(): void
     {
+        $this->autenticarComo('admin');
+
         $reserva = Reserva::factory()->confirmada()->create();
 
         $this->deleteJson("/api/reservas/{$reserva->id}")
@@ -75,6 +102,8 @@ class ApiRestTest extends TestCase
 
     public function test_confirmar_reserva_por_el_subrecurso_estados(): void
     {
+        $this->autenticarComo('admin');
+
         $reserva = Reserva::factory()->pendiente()->create();
 
         $this->postJson("/api/reservas/{$reserva->id}/estados", ['estado' => 'confirmada'])
@@ -89,6 +118,8 @@ class ApiRestTest extends TestCase
 
     public function test_estado_invalido_devuelve_422(): void
     {
+        $this->autenticarComo('admin');
+
         $reserva = Reserva::factory()->pendiente()->create();
 
         $this->postJson("/api/reservas/{$reserva->id}/estados", ['estado' => 'volando'])
@@ -100,6 +131,8 @@ class ApiRestTest extends TestCase
 
     public function test_recurso_inexistente_devuelve_404_sin_detalles_internos(): void
     {
+        $this->autenticarComo('admin');
+
         config(['app.debug' => true]);
 
         $respuesta = $this->getJson('/api/reservas/999999');
@@ -114,10 +147,16 @@ class ApiRestTest extends TestCase
 
     public function test_validacion_devuelve_422_con_detalle_por_campo(): void
     {
+        $this->autenticarComo('admin');
+
         $this->postJson('/api/tours', [])
             ->assertStatus(422)
             ->assertJsonPath('codigo', 'VALIDACION_FALLIDA')
-            ->assertJsonStructure(['mensaje', 'codigo', 'errores' => ['categoria_id', 'nombre', 'precio']]);
+            ->assertJsonStructure([
+                'mensaje',
+                'codigo',
+                'errores' => ['categoria_id', 'nombre', 'precio'],
+            ]);
     }
 
     public function test_json_malformado_devuelve_400(): void
@@ -177,6 +216,8 @@ class ApiRestTest extends TestCase
 
     public function test_reservas_de_un_cliente_solo_incluye_las_suyas(): void
     {
+        $this->autenticarComo('admin');
+
         $cliente = Cliente::factory()->create();
         Reserva::factory(2)->create(['cliente_id' => $cliente->id]);
         Reserva::factory()->create(); // de otro cliente
@@ -184,7 +225,11 @@ class ApiRestTest extends TestCase
         $this->getJson("/api/clientes/{$cliente->id}/reservas")
             ->assertOk()
             ->assertJsonCount(2, 'data')
-            ->assertJsonStructure(['data', 'links', 'meta' => ['current_page', 'last_page', 'total']]);
+            ->assertJsonStructure([
+                'data',
+                'links',
+                'meta' => ['current_page', 'last_page', 'total'],
+            ]);
     }
 
     public function test_salidas_de_un_tour(): void
@@ -196,11 +241,24 @@ class ApiRestTest extends TestCase
         $this->getJson("/api/tours/{$tour->id}/salidas")
             ->assertOk()
             ->assertJsonCount(3, 'data')
-            ->assertJsonStructure(['data' => [['id', 'tour_id', 'fecha', 'hora', 'cupo_maximo', 'estado']], 'links', 'meta']);
+            ->assertJsonStructure([
+                'data' => [[
+                    'id',
+                    'tour_id',
+                    'fecha',
+                    'hora',
+                    'cupo_maximo',
+                    'estado',
+                ]],
+                'links',
+                'meta',
+            ]);
     }
 
     public function test_relacion_anidada_con_padre_inexistente_devuelve_404(): void
     {
+        $this->autenticarComo('admin');
+
         $this->getJson('/api/clientes/999999/reservas')->assertNotFound();
         $this->getJson('/api/tours/999999/salidas')->assertNotFound();
     }
@@ -214,7 +272,18 @@ class ApiRestTest extends TestCase
         $datos = $this->getJson("/api/tours/{$tour->id}")->assertOk()->json('data');
 
         $this->assertEqualsCanonicalizing(
-            ['id', 'categoria_id', 'nombre', 'descripcion', 'precio', 'duracion_horas', 'estado', 'categoria', 'creado_en', 'actualizado_en'],
+            [
+                'id',
+                'categoria_id',
+                'nombre',
+                'descripcion',
+                'precio',
+                'duracion_horas',
+                'estado',
+                'categoria',
+                'creado_en',
+                'actualizado_en',
+            ],
             array_keys($datos),
         );
         $this->assertIsFloat($datos['precio']);

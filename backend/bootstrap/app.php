@@ -30,6 +30,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // Las rutas de la API no deben redirigir a una ruta web de login.
         // Una petición no autenticada debe terminar en 401 JSON.
         $middleware->redirectGuestsTo(null);
+
+        // Alias para autorización por roles.
+        $middleware->alias([
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $esApi = fn (Request $request): bool => $request->is('api/*') || $request->expectsJson();
