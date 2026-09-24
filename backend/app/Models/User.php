@@ -19,6 +19,17 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
+     * Get the client associated with this authenticated user.
+     *
+     * The current domain model identifies clients by their unique email.
+     * The authenticated user uses the same email as the identity bridge.
+     */
+    public function cliente()
+    {
+        return $this->hasOne(Cliente::class, 'email', 'email');
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

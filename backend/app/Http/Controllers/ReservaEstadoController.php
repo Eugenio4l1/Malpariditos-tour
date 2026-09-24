@@ -10,6 +10,7 @@ use App\Support\ApiDocs;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\PathParameter;
 use Dedoc\Scramble\Attributes\Response as ApiResponse;
+use Illuminate\Support\Facades\Gate;
 
 #[Group('Reservas')]
 class ReservaEstadoController extends Controller
@@ -27,11 +28,14 @@ class ReservaEstadoController extends Controller
      */
     #[PathParameter('reserva', description: 'Identificador de la reserva.', type: 'int', example: 1)]
     #[ApiResponse(400, 'El cuerpo no es un JSON válido (`SOLICITUD_MALFORMADA`).', type: ApiDocs::ERROR)]
+    #[ApiResponse(403, 'El usuario no tiene permiso para cambiar el estado (`PROHIBIDO`).', type: ApiDocs::ERROR)]
     #[ApiResponse(404, 'La reserva no existe (`RECURSO_NO_ENCONTRADO`).', type: ApiDocs::ERROR)]
     #[ApiResponse(409, 'Transición no permitida (`ESTADO_INVALIDO`): por ejemplo, confirmar una reserva que no está pendiente.', type: ApiDocs::ERROR)]
     #[ApiResponse(422, 'Estado inválido (`VALIDACION_FALLIDA`). Solo se acepta `confirmada` o `cancelada`.', type: ApiDocs::ERROR_VALIDACION)]
     public function store(StoreReservaEstadoRequest $request, Reserva $reserva): ReservaResource
     {
+        Gate::authorize('changeState', $reserva);
+
         return new ReservaResource(
             $this->service->cambiarEstado($reserva, $request->validated('estado'))
         );

@@ -11,6 +11,7 @@ use Dedoc\Scramble\Attributes\PathParameter;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Dedoc\Scramble\Attributes\Response as ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 #[Group('Reservas')]
 class ClienteReservaController extends Controller
@@ -24,6 +25,8 @@ class ClienteReservaController extends Controller
      *
      * Recurso anidado: devuelve solo las reservas del cliente indicado.
      * Admite los mismos filtros, orden y paginación que `GET /reservas`.
+     *
+     * Un cliente solamente puede consultar sus propias reservas.
      */
     #[PathParameter('cliente', description: 'Identificador del cliente.', type: 'int', example: 1)]
     #[QueryParameter('page', description: 'Número de página.', type: 'int', default: 1, example: 2)]
@@ -31,10 +34,15 @@ class ClienteReservaController extends Controller
     #[QueryParameter('estado', description: 'Filtra por estado: `pendiente`, `confirmada` o `cancelada`.', type: 'string', example: 'pendiente')]
     #[QueryParameter('sort_by', description: 'Campo de orden: `fecha_reserva`, `total`, `cantidad_personas` o `created_at`.', type: 'string', default: 'fecha_reserva', example: 'total')]
     #[QueryParameter('sort_dir', description: 'Dirección del orden: `asc` o `desc`.', type: 'string', default: 'desc', example: 'asc')]
+    #[ApiResponse(403, 'El usuario no tiene permiso para consultar las reservas de este cliente (`PROHIBIDO`).', type: ApiDocs::ERROR)]
     #[ApiResponse(404, 'El cliente no existe (`RECURSO_NO_ENCONTRADO`).', type: ApiDocs::ERROR)]
     public function index(Request $request, Cliente $cliente)
     {
-        $filtros = array_merge($request->query(), ['cliente_id' => $cliente->id]);
+        Gate::authorize('view', $cliente);
+
+        $filtros = array_merge($request->query(), [
+            'cliente_id' => $cliente->id,
+        ]);
 
         return ReservaResource::collection($this->service->list($filtros));
     }

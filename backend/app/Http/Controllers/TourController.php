@@ -17,6 +17,7 @@ use Dedoc\Scramble\Attributes\Response as ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 #[Group('Tours', description: 'Catálogo de tours turísticos.', weight: 1)]
 class TourController extends Controller
@@ -53,9 +54,12 @@ class TourController extends Controller
      */
     #[Header('Location', 'URL del tour creado, por ejemplo http://localhost:8000/api/tours/21.', type: 'string', status: 201)]
     #[ApiResponse(400, 'El cuerpo no es un JSON válido (`SOLICITUD_MALFORMADA`).', type: ApiDocs::ERROR)]
+    #[ApiResponse(403, 'El usuario no tiene permiso para crear tours (`PROHIBIDO`).', type: ApiDocs::ERROR)]
     #[ApiResponse(422, 'Datos inválidos (`VALIDACION_FALLIDA`). El detalle va por campo en `errores`.', type: ApiDocs::ERROR_VALIDACION)]
     public function store(StoreTourRequest $request): JsonResponse
     {
+        Gate::authorize('create', Tour::class);
+
         $tour = $this->service->create($request->validated());
 
         /**
@@ -90,10 +94,13 @@ class TourController extends Controller
     #[Endpoint(method: 'PATCH')]
     #[PathParameter('tour', description: 'Identificador del tour.', type: 'int', example: 1)]
     #[ApiResponse(400, 'El cuerpo no es un JSON válido (`SOLICITUD_MALFORMADA`).', type: ApiDocs::ERROR)]
+    #[ApiResponse(403, 'El usuario no tiene permiso para modificar el tour (`PROHIBIDO`).', type: ApiDocs::ERROR)]
     #[ApiResponse(404, 'El tour no existe (`RECURSO_NO_ENCONTRADO`).', type: ApiDocs::ERROR)]
     #[ApiResponse(422, 'Datos inválidos (`VALIDACION_FALLIDA`). El detalle va por campo en `errores`.', type: ApiDocs::ERROR_VALIDACION)]
     public function update(UpdateTourRequest $request, Tour $tour): TourResource
     {
+        Gate::authorize('update', $tour);
+
         return new TourResource($this->service->update($tour, $request->validated()));
     }
 
@@ -104,10 +111,13 @@ class TourController extends Controller
      */
     #[PathParameter('tour', description: 'Identificador del tour.', type: 'int', example: 2)]
     #[ApiResponse(204, 'Tour eliminado. La respuesta no tiene cuerpo.')]
+    #[ApiResponse(403, 'El usuario no tiene permiso para eliminar el tour (`PROHIBIDO`).', type: ApiDocs::ERROR)]
     #[ApiResponse(404, 'El tour no existe (`RECURSO_NO_ENCONTRADO`).', type: ApiDocs::ERROR)]
     #[ApiResponse(409, 'El tour tiene reservas activas (`TOUR_CON_DEPENDENCIAS`).', type: ApiDocs::ERROR)]
     public function destroy(Tour $tour): Response
     {
+        Gate::authorize('delete', $tour);
+
         $this->service->delete($tour);
 
         return response()->noContent();

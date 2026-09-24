@@ -56,23 +56,30 @@ class ApiRestTest extends TestCase
     }
 
     public function test_crear_reserva_devuelve_201_con_location(): void
-    {
-        $this->autenticarComo('cliente');
+{
+    $usuario = User::factory()->create([
+        'role' => 'cliente',
+    ]);
 
-        $cliente = Cliente::factory()->create();
-        $salida = SalidaTour::factory()->create(['cupo_maximo' => 10]);
+    $cliente = Cliente::factory()->create([
+        'email' => $usuario->email,
+    ]);
 
-        $respuesta = $this->postJson('/api/reservas', [
-            'cliente_id' => $cliente->id,
-            'salida_tour_id' => $salida->id,
-            'cantidad_personas' => 2,
-            'fecha_reserva' => now()->toDateString(),
-        ]);
+    $this->actingAs($usuario, 'sanctum');
 
-        $respuesta->assertCreated()->assertJsonPath('data.estado', 'pendiente');
-        $id = $respuesta->json('data.id');
-        $this->assertStringEndsWith("/api/reservas/{$id}", $respuesta->headers->get('Location'));
-    }
+    $salida = SalidaTour::factory()->create(['cupo_maximo' => 10]);
+
+    $respuesta = $this->postJson('/api/reservas', [
+        'cliente_id' => $cliente->id,
+        'salida_tour_id' => $salida->id,
+        'cantidad_personas' => 2,
+        'fecha_reserva' => now()->toDateString(),
+    ]);
+
+    $respuesta->assertCreated()->assertJsonPath('data.estado', 'pendiente');
+    $id = $respuesta->json('data.id');
+    $this->assertStringEndsWith("/api/reservas/{$id}", $respuesta->headers->get('Location'));
+}
 
     // ---------- 204 / 409 ----------
 
