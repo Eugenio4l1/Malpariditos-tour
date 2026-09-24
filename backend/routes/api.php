@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 // Autenticación
 Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
 
 // Tours: sustantivos en plural, sin verbos en la ruta
 Route::apiResource('tours', 'App\\Http\\Controllers\\TourController');
