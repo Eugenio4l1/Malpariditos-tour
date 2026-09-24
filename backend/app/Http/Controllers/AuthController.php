@@ -6,6 +6,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -62,6 +63,18 @@ class AuthController extends Controller
                 ],
                 'token' => $token,
             ],
+        ], 200);
+    }
+
+    /**
+     * Cierra la sesión y revoca el token utilizado.
+     */
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()->currentAccessToken()?->delete();
+
+        return response()->json([
+            'mensaje' => 'Sesión cerrada correctamente.',
         ], 200);
     }
 }

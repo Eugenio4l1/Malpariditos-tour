@@ -26,6 +26,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // JSON malformado -> 400 antes de llegar a la validación (que daría 422)
         $middleware->api(prepend: [RejectMalformedJson::class]);
+
+        // Las rutas de la API no deben redirigir a una ruta web de login.
+        // Una petición no autenticada debe terminar en 401 JSON.
+        $middleware->redirectGuestsTo(null);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $esApi = fn (Request $request): bool => $request->is('api/*') || $request->expectsJson();
