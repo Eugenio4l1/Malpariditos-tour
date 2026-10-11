@@ -23,9 +23,7 @@
     <div class="container site-header__inner">
 
       <a class="brand" href="index.html">
-        <svg class="brand__logo" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
-          <rect width="36" height="36" rx="8" fill="#24609C"/>
-        </svg>
+       <img class="brand__logo" src="img/logo.jpg" alt="" width="36" height="36">
         <span>Malpariditos Tours</span>
       </a>
 
@@ -72,17 +70,26 @@
         <div class="detail__main">
 
           <!-- 1. Galería -->
-          <section class="gallery" aria-label="Galería de fotos">
-            <div class="gallery__main" role="img" aria-label="Foto principal del tour: vista del volcán Arenal" data-gallery-main>
-              <span class="card__label" aria-hidden="true" data-gallery-label>Foto principal</span>
-            </div>
-            <ul class="gallery__thumbs">
-              <li><button class="gallery__thumb" type="button" aria-pressed="true" data-label="Foto principal" data-alt="Foto principal del tour: vista del volcán Arenal"><span aria-hidden="true">Foto 1</span><span class="visually-hidden">Ver foto 1: vista del volcán</span></button></li>
-              <li><button class="gallery__thumb" type="button" aria-pressed="false" data-label="Foto 2" data-alt="Foto 2: grupo caminando por el sendero del volcán"><span aria-hidden="true">Foto 2</span><span class="visually-hidden">Ver foto 2: sendero del volcán</span></button></li>
-              <li><button class="gallery__thumb" type="button" aria-pressed="false" data-label="Foto 3" data-alt="Foto 3: piscinas de aguas termales"><span aria-hidden="true">Foto 3</span><span class="visually-hidden">Ver foto 3: aguas termales</span></button></li>
-              <li><button class="gallery__thumb" type="button" aria-pressed="false" data-label="Foto 4" data-alt="Foto 4: familia de una comunidad rural preparando comida"><span aria-hidden="true">Foto 4</span><span class="visually-hidden">Ver foto 4: comunidad rural</span></button></li>
-            </ul>
-          </section>
+         <section class="gallery" aria-label="Galería de fotos">
+  <div class="gallery__main">
+    <img class="gallery__img" src="https://images.pexels.com/photos/6656141/pexels-photo-6656141.jpeg" alt="Vista del volcán Arenal"
+         width="1200" height="675" fetchpriority="high" data-gallery-main>
+  </div>
+  <ul class="gallery__thumbs">
+    <li><button class="gallery__thumb" type="button" aria-pressed="true" aria-label="Ver foto 1: vista del volcán"
+         data-src="https://images.pexels.com/photos/6656141/pexels-photo-6656141.jpeg" data-alt="Vista del volcán Arenal">
+         <img src="https://images.pexels.com/photos/6656141/pexels-photo-6656141.jpeg" alt="" width="200" height="125" loading="lazy"></button></li>
+    <li><button class="gallery__thumb" type="button" aria-pressed="false" aria-label="Ver foto 2: sendero del volcán"
+         data-src="https://images.pexels.com/photos/10832933/pexels-photo-10832933.jpeg" data-alt="Grupo caminando por el sendero del volcán">
+         <img src="https://images.pexels.com/photos/10832933/pexels-photo-10832933.jpeg" alt="" width="200" height="125" loading="lazy"></button></li>
+    <li><button class="gallery__thumb" type="button" aria-pressed="false" aria-label="Ver foto 3: aguas termales"
+         data-src="https://images.pexels.com/photos/30658685/pexels-photo-30658685.jpeg" data-alt="Piscinas de aguas termales">
+         <img src="https://images.pexels.com/photos/30658685/pexels-photo-30658685.jpeg" alt="" width="200" height="125" loading="lazy"></button></li>
+    <li><button class="gallery__thumb" type="button" aria-pressed="false" aria-label="Ver foto 4: comunidad rural"
+         data-src="https://images.pexels.com/photos/16728513/pexels-photo-16728513.jpeg" data-alt="Familia de una comunidad rural preparando comida">
+         <img src="https://images.pexels.com/photos/16728513/pexels-photo-16728513.jpeg" alt="" width="200" height="125" loading="lazy"></button></li>
+  </ul>
+</section>
 
           <!-- 2. Resumen -->
           <header class="summary">
@@ -129,28 +136,28 @@
                 <li>Guía local bilingüe</li>
                 <li>Transporte durante el tour</li>
                 <li>Entrada a las aguas termales</li>
-                <li>Desayunos y almuerzo típico</li>
+                <li>Desayunos, y galleta y atun suli de almuerzo</li>
               </ul>
             </section>
 
           <!-- 4. Guía asignado -->
           <section class="guide-card" aria-labelledby="titulo-guia">
             <h2 class="visually-hidden" id="titulo-guia">Guía asignado</h2>
-            <div class="guide-card__photo" aria-hidden="true">foto</div>
+            <img class="guide-card__photo" src="https://media.tenor.com/cmnOLYxGICYAAAAe/timmy-mcdoodle.png" alt="" width="56" height="56" loading="lazy">
             <div class="guide-card__text">
-              <p><strong>Su guía: Ana Rojas</strong></p>
-              <p class="text-small text-muted">Español, English · 8 años de experiencia</p>
+              <p><strong>Su guía: Timmy</strong></p>
+              <p class="text-small text-muted">Español, English, Supervivencia nuclear· 8 años de experiencia</p>
             </div>
-            <a class="btn btn--secondary" href="#">Ver perfil<span class="visually-hidden"> de Ana Rojas</span></a>
+            <a class="btn btn--secondary" href="#">Ver perfil<span class="visually-hidden"> de Timmy</span></a>
           </section>
 
           <!-- 8. Mapa -->
           <section class="map" aria-labelledby="titulo-mapa">
             <h2 class="visually-hidden" id="titulo-mapa">Punto de encuentro</h2>
-            <div class="map__frame" role="img" aria-label="Mapa del punto de encuentro, en el parque central de La Fortuna">
-              <span class="card__label" aria-hidden="true">Mapa del punto de encuentro</span>
-            </div>
-            <address class="map__address">Punto de encuentro: Parque Central de La Fortuna, frente a la iglesia, San Carlos, Alajuela.</address>
+            <img class="map__img" src="https://i.redd.it/0dd509kqrdc31.jpg"
+     alt="Mapa del punto de encuentro: Parque Central de La Fortuna"
+     width="1200" height="400" loading="lazy">
+            <address class="map__address">Punto de encuentro: En la mesa de poker del casino </address>
           </section>
 
         </div>
@@ -215,7 +222,7 @@
             <h2 id="titulo-info">Información útil</h2>
             <details>
               <summary>Punto de encuentro</summary>
-              <p class="text-small text-muted">Parque Central de La Fortuna, 15 minutos antes de la salida.</p>
+              <p class="text-small text-muted">En la mesa de poker del casino o en la Ruleta</p>
             </details>
             <details>
               <summary>Qué llevar</summary>
@@ -223,11 +230,11 @@
             </details>
             <details>
               <summary>Políticas de cancelación</summary>
-              <p class="text-small text-muted">Cancelación gratuita hasta 48 horas antes del tour.</p>
+              <p class="text-small text-muted">Cancelación gratuita hasta 48 horas antes del tour,gente sobria.</p>
             </details>
             <details>
               <summary>Contacto del guía</summary>
-              <p class="text-small text-muted">Se comparte por correo una vez confirmada la reserva.</p>
+              <p class="text-small text-muted">Se comparte por correo una vez confirmada la reserva, o por paloma mensajera, o por riotgames solo de Esmeralda para arriba.</p>
             </details>
           </section>
 

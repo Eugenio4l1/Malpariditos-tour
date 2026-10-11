@@ -63,6 +63,25 @@
   align-self: center;
   justify-self: center;
 }
+.gallery__img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+.gallery__thumb {
+  padding: 0;
+  overflow: hidden;
+}
+
+.gallery__thumb img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
 
 /* Grid: cuatro miniaturas iguales, sin importar el contenido */
 .gallery__thumbs {
