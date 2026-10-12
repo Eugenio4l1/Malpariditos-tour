@@ -967,6 +967,7 @@ main {
   font-size: var(--fs-caption);
   line-height: var(--lh-caption);
   font-weight: 500;
+  object-fit: cover;
 }
 
 .breadcrumb {

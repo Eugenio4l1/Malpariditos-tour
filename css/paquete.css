@@ -260,6 +260,7 @@
   background: var(--color-surface);
   border-radius: 50%;
   font-size: var(--fs-caption);
+  object-fit: cover;
 }
 
 .guide-card__text {
@@ -273,6 +274,15 @@
   place-items: center;
   min-height: 8rem;
   background: var(--placeholder);
+  border-radius: var(--radius);
+}
+
+.map__img {
+  width: 100%;
+  height: auto;
+  min-height: 8rem;
+  aspect-ratio: 16 / 6;
+  object-fit: cover;
   border-radius: var(--radius);
 }
 
