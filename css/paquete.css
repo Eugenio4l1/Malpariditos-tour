@@ -1,0 +1,553 @@
+/* Pantalla 7.3 · Detalle del paquete y reserva.
+   Se carga después de global.css y reutiliza sus propiedades personalizadas.
+   Móvil primero. Puntos de quiebre: 48em (tableta) y 64em (escritorio). */
+
+:root {
+  /* Recuadro de foto de marcador (diagonales sobre Arena), igual que en las tarjetas */
+  --placeholder:
+    linear-gradient(to top right, transparent calc(50% - 0.5px), rgb(31 41 51 / 0.3) calc(50% - 0.5px), rgb(31 41 51 / 0.3) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+    linear-gradient(to bottom right, transparent calc(50% - 0.5px), rgb(31 41 51 / 0.3) calc(50% - 0.5px), rgb(31 41 51 / 0.3) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+    var(--color-surface);
+}
+
+.detail {
+  align-items: start;
+}
+
+.detail__main,
+.detail__side {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+/* Flexbox: pila vertical de bloques con espacio uniforme (una sola dimensión) */
+.detail__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+@media (min-width: 64em) {
+  .detail__main { grid-column: span 8; }
+  .detail__side { grid-column: span 4; }
+}
+
+/* Sticky solo si hay altura de sobra. Al estar en em, con la letra al 200 % la condición deja de
+   cumplirse y el panel vuelve a fluir normal, así nunca queda contenido tapado. */
+@media (min-width: 64em) and (min-height: 56em) {
+  .detail__side {
+    position: sticky;
+    top: 5.5rem;
+  }
+}
+
+/* ---------- 1. Galería ---------- */
+
+/* Flexbox: foto principal y fila de miniaturas apiladas */
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Grid: el texto del marcador se centra en la misma celda que el recuadro */
+.gallery__main {
+  display: grid;
+  aspect-ratio: 16 / 9;
+  background: var(--placeholder);
+  border-radius: var(--radius);
+}
+
+.gallery__main > * {
+  grid-area: 1 / 1;
+  align-self: center;
+  justify-self: center;
+}
+.gallery__img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+.gallery__thumb {
+  padding: 0;
+  overflow: hidden;
+}
+
+.gallery__thumb img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+/* Grid: cuatro miniaturas iguales, sin importar el contenido */
+.gallery__thumbs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-sm);
+  padding: 0;
+  list-style: none;
+}
+
+.gallery__thumb {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: var(--touch-min);
+  aspect-ratio: 16 / 10;
+  background: var(--placeholder);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.gallery__thumb[aria-pressed="true"] {
+  border-color: var(--color-primary-dark);
+}
+
+/* ---------- 2. Resumen ---------- */
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-surface);
+  border-radius: 999px;
+  color: var(--color-text);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+}
+
+/* ---------- 3. Pestañas ---------- */
+
+.tabs__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-lg);
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--color-surface);
+}
+
+.tabs__list a,
+.tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-min);
+  padding: 0 var(--space-xs);
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tabs__tab[aria-selected="true"] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* Flexbox: contenido de cada panel apilado */
+.tabs__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding-top: var(--space-lg);
+}
+
+.tabs__panel[hidden] {
+  display: none;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: 0;
+  list-style: none;
+  counter-reset: paso;
+}
+
+/* Flexbox: círculo numerado a la izquierda y texto a la derecha */
+.steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.steps li::before {
+  counter-increment: paso;
+  content: counter(paso);
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  background: var(--color-primary);
+  border-radius: 50%;
+  color: var(--color-white);
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+
+.includes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: 0;
+  list-style: none;
+}
+
+.includes li {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.includes li::before {
+  content: "✓";
+  content: "✓" / "";
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+.review {
+  padding: var(--space-lg);
+  background: var(--color-white);
+  border: 1px solid var(--color-surface);
+  border-radius: var(--radius);
+}
+
+/* ---------- 4. Guía asignado ---------- */
+
+/* Flexbox: foto, texto y botón en una fila que salta de línea si no caben */
+.guide-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--color-white);
+  border: 1px solid var(--color-surface);
+  border-radius: var(--radius);
+}
+
+.guide-card__photo {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 3.5rem;
+  height: 3.5rem;
+  background: var(--color-surface);
+  border-radius: 50%;
+  font-size: var(--fs-caption);
+}
+
+.guide-card__text {
+  flex: 1 1 12rem;
+}
+
+/* ---------- 8. Mapa ---------- */
+
+.map__frame {
+  display: grid;
+  place-items: center;
+  min-height: 8rem;
+  background: var(--placeholder);
+  border-radius: var(--radius);
+}
+
+.map__address {
+  margin-top: var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  font-style: normal;
+}
+
+/* ---------- 5. Panel de reserva ---------- */
+
+/* Flexbox: bloques del panel apilados con el mismo espacio */
+.booking {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  background: var(--color-white);
+  border: 2px solid var(--color-primary-dark);
+  border-radius: var(--radius);
+}
+
+.booking__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-xs) var(--space-sm);
+}
+
+.booking__amount {
+  font-family: var(--font-heading);
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.booking__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.booking__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* Flexbox: botón menos, campo y botón más en una fila */
+.stepper {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.stepper__btn {
+  flex: none;
+  padding: 0;
+  font-size: var(--fs-h4);
+}
+
+.stepper__input {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.stepper__input::-webkit-outer-spin-button,
+.stepper__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Flexbox: concepto a la izquierda y monto a la derecha en cada fila */
+.booking__summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-surface);
+}
+
+.booking__summary > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.booking__summary dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.booking__total {
+  font-family: var(--font-heading);
+  font-size: var(--fs-h4);
+  line-height: var(--lh-h4);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.booking__status {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 2px solid var(--color-success);
+  border-radius: var(--radius);
+  color: var(--color-success);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  font-weight: 500;
+}
+
+.booking__status[hidden] {
+  display: none;
+}
+
+.booking__status::before {
+  content: "✓";
+  content: "✓" / "";
+  font-weight: 700;
+}
+
+.booking__note {
+  text-align: center;
+}
+
+/* Flexbox: Guardar y Compartir con el mismo ancho */
+.booking__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.booking__actions .btn {
+  flex: 1 1 6rem;
+}
+
+.booking__close {
+  display: none;
+  align-self: flex-end;
+}
+
+/* ---------- Móvil y tableta: barra inferior + hoja de reserva (solo con JavaScript) ---------- */
+
+.booking-bar {
+  display: none;
+}
+
+.js .booking-bar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--gutter);
+  background: var(--color-white);
+  border-top: 2px solid var(--color-surface);
+}
+
+.booking-bar__price {
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+}
+
+.booking-bar__price strong {
+  font-family: var(--font-heading);
+  font-size: var(--fs-h4);
+  color: var(--color-primary-dark);
+}
+
+.js .has-booking-bar {
+  padding-bottom: 6rem;
+}
+
+.js .booking:not(.is-open) {
+  display: none;
+}
+
+.js .booking.is-open {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 80;
+  max-height: 90dvh;
+  overflow-y: auto;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.js .booking__close {
+  display: inline-flex;
+}
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgb(31 41 51 / 0.6);
+}
+
+.sheet-backdrop[hidden] {
+  display: none;
+}
+
+.sheet-open {
+  overflow: hidden;
+}
+
+@media (min-width: 64em) {
+  .js .booking-bar,
+  .js .booking__close,
+  .sheet-backdrop {
+    display: none;
+  }
+
+  .js .has-booking-bar {
+    padding-bottom: 0;
+  }
+
+  .js .booking:not(.is-open) {
+    display: flex;
+  }
+}
+
+/* ---------- Información útil ---------- */
+
+.info {
+  margin-top: var(--space-xl);
+  padding: var(--space-lg);
+  border: 2px dashed var(--color-surface);
+  border-radius: var(--radius);
+}
+
+.info details {
+  border-bottom: 1px solid var(--color-surface);
+}
+
+.info summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  min-height: var(--touch-min);
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+}
+
+.info summary::-webkit-details-marker {
+  display: none;
+}
+
+.info summary::after {
+  content: "+";
+  content: "+" / "";
+  font-size: var(--fs-h4);
+}
+
+.info details[open] summary::after {
+  content: "−";
+  content: "−" / "";
+}
+
+.info details p {
+  padding-bottom: var(--space-md);
+}
+
+.info h2 {
+  font-size: var(--fs-h4);
+  line-height: var(--lh-h4);
+}

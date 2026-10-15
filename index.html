@@ -1,11 +1,255 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hijuesputas Nicas</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio | Malpariditos Tours</title>
+  <meta name="description" content="Tours urbanos y rurales con guías locales en Costa Rica.">
+
+  <script>document.documentElement.classList.add("js");</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap">
+
+  <link rel="stylesheet" href="css/global.css">
 </head>
 <body>
-<p>Hijuesputas Nicas</p>
+
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+
+      <a class="brand" href="index.html">
+       <img class="brand__logo" src="img/logo.jpg" alt="" width="36" height="36">
+        <span>Malpariditos Tours</span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+        <span class="visually-hidden">Menú</span>
+      </button>
+
+      <nav class="site-nav" id="menu-principal" aria-label="Principal">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="catalogo.html">Paquetes</a></li>
+          <li><a class="site-nav__link" href="#">Destinos</a></li>
+          <li><a class="site-nav__link" href="#">Guías</a></li>
+          <li><a class="site-nav__link" href="#">Eventos</a></li>
+          <li><a class="site-nav__link" href="#">Nosotros</a></li>
+        </ul>
+        <div class="site-nav__actions">
+          <a class="btn btn--secondary" href="#">Ingresar</a>
+          <a class="btn btn--primary" href="#">Registrarse</a>
+        </div>
+      </nav>
+
+    </div>
+  </header>
+
+  <main id="contenido" tabindex="-1">
+
+    <section class="hero on-dark" aria-labelledby="titulo-portada">
+      <div class="container">
+        <div class="hero__content">
+          <h1 class="display" id="titulo-portada">Descubra Costa Rica <span class="hero__accent">a su ritmo</span></h1>
+          <p class="hero__lead">Tours urbanos y rurales con guías locales. Una institucion de gente seria.</p>
+          <div class="hero__actions">
+            <a class="btn btn--accent" href="catalogo.html">Ver paquetes</a>
+            <a class="btn btn--light" href="paquete.html#reserva">Cómo reservar</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container search" aria-labelledby="titulo-buscador">
+      <h2 class="visually-hidden" id="titulo-buscador">Buscador rápido de tours</h2>
+      <form action="catalogo.html" method="get" role="search">
+        <div class="search__fields">
+          <div class="field">
+            <label class="field__label" for="buscar-destino">Destino</label>
+            <input class="field__control" id="buscar-destino" name="destino" type="text" placeholder="¿A dónde va?" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="field__label" for="buscar-tipo">Tipo</label>
+            <select class="field__control" id="buscar-tipo" name="tipo">
+              <option value="">Urbano / Rural</option>
+              <option value="urbano">Urbano</option>
+              <option value="rural">Rural</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="buscar-fecha">Fecha</label>
+            <input class="field__control" id="buscar-fecha" name="fecha" type="date">
+          </div>
+          <div class="field">
+            <label class="field__label" for="buscar-personas">Personas</label>
+            <input class="field__control" id="buscar-personas" name="personas" type="number" min="1" max="20" value="2" inputmode="numeric">
+          </div>
+          <button class="btn btn--primary" type="submit">Buscar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="section" aria-labelledby="titulo-destacados">
+      <div class="container">
+        <div class="section-head">
+          <h2 id="titulo-destacados">Paquetes destacados</h2>
+          <a class="link-more" href="catalogo.html">Ver todos<span class="visually-hidden"> los paquetes</span></a>
+        </div>
+
+        <ul class="card-grid card-grid--wide">
+          <li>
+            <article class="card">
+              <div class="card__media">
+  <img class="card__img" src="https://images.pexels.com/photos/39402239/pexels-photo-39402239.jpeg"
+       alt="Tour histórico por el centro de San José" width="800" height="600" fetchpriority="high">
+  <span class="badge">Urbano</span>
+</div>
+              <div class="card__body">
+                <h3>Tour histórico San José</h3>
+                <p class="card__place">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+                  San José
+                </p>
+            
+                <div class="card__footer">
+                  <p class="price"><span class="price__from">Desde</span> $45</p>
+                  <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Tour histórico San José</span></a>
+                </div>
+              </div>
+            </article>
+          </li>
+
+          <li>
+            <article class="card">
+              <div class="card__media">
+  <img class="card__img" src="https://images.pexels.com/photos/9069745/pexels-photo-9069745.jpeg"
+       alt="Volcán y aguas termales de La Fortuna" width="800" height="600" loading="lazy">
+  <span class="badge">Rural</span>
+</div>
+              <div class="card__body">
+                <h3>Volcán y aguas termales</h3>
+                <p class="card__place">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+                  La Fortuna
+                </p>
+              
+                <div class="card__footer">
+                  <p class="price"><span class="price__from">Desde</span> $120</p>
+                  <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Volcán y aguas termales</span></a>
+                </div>
+              </div>
+            </article>
+          </li>
+
+          <li>
+            <article class="card">
+           <div class="card__media">
+  <img class="card__img" src="https://images.pexels.com/photos/34204821/pexels-photo-34204821.jpeg"
+       alt="Café, montaña y mariposas en Monteverde" width="800" height="600" loading="lazy">
+  <span class="badge">Rural</span>
+</div>
+              <div class="card__body">
+                <h3>Café, montaña y mariposas</h3>
+                <p class="card__place">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+                  Monteverde
+                </p>
+            
+                <div class="card__footer">
+                  <p class="price"><span class="price__from">Desde</span> $95</p>
+                  <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Café, montaña y mariposas</span></a>
+                </div>
+              </div>
+            </article>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="titulo-tipo-viaje">
+      <div class="container">
+        <h2 id="titulo-tipo-viaje" class="section-head">Explore por tipo de viaje</h2>
+
+        <div class="type-grid">
+          <article class="type-card type-card--urban on-dark">
+            <div>
+              <h3>Turismo urbano</h3>
+              <p class="text-small">Museos, gastronomía y cultura</p>
+            </div>
+            <a class="btn btn--light" href="catalogo.html?tipo=urbano">Explorar<span class="visually-hidden"> turismo urbano</span></a>
+          </article>
+
+          <article class="type-card type-card--rural on-dark">
+            <div>
+              <h3>Turismo rural</h3>
+              <p class="text-small">Naturaleza, fincas y comunidades</p>
+            </div>
+            <a class="btn btn--light" href="catalogo.html?tipo=rural">Explorar<span class="visually-hidden"> turismo rural</span></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="section">
+      <div class="container layout-grid">
+
+        <section class="info-col" aria-labelledby="titulo-eventos">
+          <h2 id="titulo-eventos" class="section-head">Próximos eventos</h2>
+          <ul class="event-list">
+            <li class="event">
+              <time class="event__date" datetime="2026-10-30">31 OCT</time>
+              <div>
+                <p class="event__title"><a href="#">After hallowen</a></p>
+                <p class="text-small text-muted">La choza de V.A.U.L.I · Hasta que se acabe el guaro</p>
+              </div>
+            </li>
+            <li class="event">
+              <time class="event__date" datetime="2026-11-15">15 NOV</time>
+              <div>
+                <p class="event__title"><a href="#">Festival de la luz</a></p>
+                <p class="text-small text-muted">Lugar · Cupos disponibles</p>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <section class="info-col" aria-labelledby="titulo-guias">
+          <h2 id="titulo-guias" class="section-head">Conozca a nuestros guías</h2>
+         <ul class="guide-list">
+  <li><a class="guide" href="#"><img class="guide__avatar" src="https://i.pinimg.com/736x/0a/2f/4a/0a2f4ae218291666b00b84a7e098d3c3.jpg" alt="" width="72" height="72" loading="lazy">Dereck</a></li>
+  <li><a class="guide" href="#"><img class="guide__avatar" src="https://cdn.tomodachiplaza.app/miis/4248/mii.webp?v=1777843068" alt="" width="72" height="72" loading="lazy">Roberto</a></li>
+  <li><a class="guide" href="#"><img class="guide__avatar" src="https://cdn.tomodachiplaza.app/miis/51281/mii.webp?v=1785505135" alt="" width="72" height="72" loading="lazy">Aaron</a></li>
+  <li><a class="guide" href="#"><img class="guide__avatar" src="https://cdn.tomodachiplaza.app/miis/3119/mii.webp?v=1777357081" alt="" width="72" height="72" loading="lazy">Sarita</a></li>
+  <li><a class="guide" href="#"><img class="guide__avatar" src="https://images-ext-1.discordapp.net/external/_0t9fUhq5ERlMy8DzFbGW9n6wEsNK283WaKtOqNhP_w/%3Fr%3D0%26rs%3D1%26pid%3DImgDetMain%26o%3D7%26rm%3D3/https/tse4.mm.bing.net/th/id/OIP.JB0hhaQXyEHfmxfTqaaFAwHaJN?format=webp" alt="" width="72" height="72" loading="lazy">Eugin</a></li>
+</ul>
+        </section>
+
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p class="site-footer__brand">Malpariditos Tours</p>
+      <nav aria-label="Pie de página">
+        <ul class="site-footer__list">
+          <li><a href="#">Contacto</a></li>
+          <li><a href="#">Redes</a></li>
+          <li><a href="#">Términos</a></li>
+          <li><a href="#">Privacidad</a></li>
+          <li><a href="#">Accesibilidad</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module" src="modules/main.js"></script>
 </body>
 </html>

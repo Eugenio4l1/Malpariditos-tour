@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paquetes de tour | Malpariditos Tours</title>
+  <meta name="description" content="Compare y filtre los paquetes de tour urbanos y rurales de Malpariditos Tours.">
+
+  <script>document.documentElement.classList.add("js");</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://images.pexels.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap">
+
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/catalogo.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+
+      <a class="brand" href="index.html">
+       <img class="brand__logo" src="img/logo.jpg" alt="" width="36" height="36">
+        <span>Malpariditos Tours</span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+        <span class="visually-hidden">Menú</span>
+      </button>
+
+      <nav class="site-nav" id="menu-principal" aria-label="Principal">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="catalogo.html" aria-current="page">Paquetes</a></li>
+          <li><a class="site-nav__link" href="#">Destinos</a></li>
+          <li><a class="site-nav__link" href="#">Guías</a></li>
+          <li><a class="site-nav__link" href="#">Eventos</a></li>
+          <li><a class="site-nav__link" href="#">Nosotros</a></li>
+        </ul>
+        <div class="site-nav__actions">
+          <a class="btn btn--secondary" href="#">Ingresar</a>
+          <a class="btn btn--primary" href="#">Registrarse</a>
+        </div>
+      </nav>
+
+    </div>
+  </header>
+
+  <main id="contenido" tabindex="-1">
+
+    <div class="container catalog-head">
+      <div>
+        <nav aria-label="Ruta de navegación">
+          <ol class="breadcrumb">
+            <li><a href="index.html">Inicio</a></li>
+            <li aria-current="page">Paquetes</li>
+          </ol>
+        </nav>
+        <h1>Paquetes de tour</h1>
+        <p class="text-small text-muted" role="status">24 paquetes encontrados</p>
+      </div>
+
+      <div class="catalog-tools">
+        <button class="btn btn--secondary filter-toggle" type="button" aria-expanded="false" aria-controls="filtros">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M3 5h14M6 10h8M9 15h2"/>
+          </svg>
+          Filtrar
+        </button>
+
+        <form class="sort" action="catalogo.html" method="get">
+          <div class="field">
+            <label class="field__label" for="orden">Ordenar por</label>
+            <select class="field__control" id="orden" name="orden">
+              <option value="precio-asc" selected>Precio: menor a mayor</option>
+              <option value="precio-desc">Precio: mayor a menor</option>
+              <option value="valoracion">Mejor valorados</option>
+              <option value="fecha">Fecha de salida</option>
+              <option value="duracion">Duración</option>
+            </select>
+          </div>
+          <button class="btn btn--secondary sort__submit" type="submit">Ordenar</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="container layout-grid catalog section">
+
+      <form class="filters catalog__filters" id="filtros" action="catalogo.html" method="get" aria-labelledby="titulo-filtros">
+        <div class="filters__head">
+          <h2 class="filters__title" id="titulo-filtros">Filtros</h2>
+          <button class="link-button" type="reset" data-clear-filters>Limpiar</button>
+        </div>
+
+        <div class="filters__body">
+
+          <fieldset class="fieldset">
+            <legend class="fieldset__legend">Tipo de turismo</legend>
+            <label class="check"><input class="check__input" type="checkbox" name="tipo" value="urbano" checked> Urbano</label>
+            <label class="check"><input class="check__input" type="checkbox" name="tipo" value="rural"> Rural</label>
+          </fieldset>
+
+          <div class="field">
+            <label class="field__label" for="filtro-provincia">Provincia</label>
+            <select class="field__control" id="filtro-provincia" name="provincia">
+              <option value="">Todas</option>
+              <option value="san-jose">San José</option>
+              <option value="alajuela">Alajuela</option>
+              <option value="cartago">Cartago</option>
+              <option value="heredia">Heredia</option>
+              <option value="guanacaste">Guanacaste</option>
+              <option value="puntarenas">Puntarenas</option>
+              <option value="limon">Limón</option>
+            </select>
+          </div>
+
+          <fieldset class="fieldset">
+            <legend class="fieldset__legend">Precio por persona</legend>
+            <div class="range">
+              <div class="range__track" aria-hidden="true"></div>
+              <label class="visually-hidden" for="precio-min">Precio mínimo</label>
+              <input class="range__input" id="precio-min" name="precio_min" type="range" min="0" max="300" step="5" value="0">
+              <label class="visually-hidden" for="precio-max">Precio máximo</label>
+              <input class="range__input" id="precio-max" name="precio_max" type="range" min="0" max="300" step="5" value="200">
+            </div>
+            <div class="range__ends" aria-hidden="true">
+              <span>$0</span>
+              <span>$300</span>
+            </div>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend class="fieldset__legend">Duración</legend>
+            <label class="check"><input class="check__input" type="checkbox" name="duracion" value="1" checked> 1 día</label>
+            <label class="check"><input class="check__input" type="checkbox" name="duracion" value="2-3"> 2 a 3 días</label>
+            <label class="check"><input class="check__input" type="checkbox" name="duracion" value="4+"> 4 días o más</label>
+          </fieldset>
+
+          <div class="field">
+            <label class="field__label" for="filtro-fecha">Fecha de salida</label>
+            <input class="field__control" id="filtro-fecha" name="fecha" type="date">
+          </div>
+
+          <fieldset class="fieldset">
+            <legend class="fieldset__legend">Idioma del guía</legend>
+            <label class="check"><input class="check__input" type="checkbox" name="idioma" value="es" checked> Español</label>
+            <label class="check"><input class="check__input" type="checkbox" name="idioma" value="en"> English</label>
+          </fieldset>
+
+          <button class="btn btn--primary btn--block" type="submit">Aplicar filtros</button>
+        </div>
+      </form>
+
+      <section class="catalog__results" aria-labelledby="titulo-resultados">
+        <h2 class="visually-hidden" id="titulo-resultados">Lista de paquetes</h2>
+
+        <ul class="card-grid">
+            <li>
+              <article class="card">
+                <div class="card__media">
+                  <span class="badge">Urbano</span>
+                  <img class="card__img" src="https://images.pexels.com/photos/39402239/pexels-photo-39402239.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" width="600" height="450" fetchpriority="high" decoding="async">
+                </div>
+                <div class="card__body">
+                  <h3>Tour histórico San José</h3>
+                  <p class="card__place">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+                    San José
+                  </p>
+                  
+                  <div class="card__footer">
+                    <p class="price"><span class="price__from">Desde</span> $45</p>
+                    <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Tour histórico San José</span></a>
+                  </div>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <article class="card">
+                <div class="card__media">
+                  <span class="badge">Rural</span>
+                  <img class="card__img" src="https://images.pexels.com/photos/11032583/pexels-photo-11032583.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" width="600" height="450" fetchpriority="high" decoding="async">
+                </div>
+                <div class="card__body">
+                  <h3>Volcán y aguas termales</h3>
+                  <p class="card__place">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+                    La Fortuna
+                  </p>
+                  
+                  <div class="card__footer">
+                    <p class="price"><span class="price__from">Desde</span> $120</p>
+                    <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Volcán y aguas termales</span></a>
+                  </div>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <article class="card">
+                <div class="card__media">
+                  <span class="badge">Urbano</span>
+                  <img class="card__img" src="https://images.pexels.com/photos/14624137/pexels-photo-14624137.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" width="600" height="450" decoding="async">
+                </div>
+                <div class="card__body">
+                  <h3>Arte y café en Cartago</h3>
+                  <p class="card__place">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+                    Cartago
+                  </p>
+                  
+                  <div class="card__footer">
+                    <p class="price"><span class="price__from">Desde</span> $60</p>
+                    <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Arte y café en Cartago</span></a>
+                  </div>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <article class="card">
+                <div class="card__media">
+                  <span class="badge">Rural</span>
+                  <img class="card__img" src="https://images.pexels.com/photos/30603643/pexels-photo-30603643.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" width="600" height="450" decoding="async">
+                </div>
+                <div class="card__body">
+                  <h3>Bosque nuboso</h3>
+                  <p class="card__place">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+                    Monteverde
+                  </p>
+                  
+                  <div class="card__footer">
+                    <p class="price"><span class="price__from">Desde</span> $95</p>
+                    <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Bosque nuboso</span></a>
+                  </div>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <article class="card">
+                <div class="card__media">
+                  <span class="badge">Rural</span>
+                  <img class="card__img" src="https://images.pexels.com/photos/35246138/pexels-photo-35246138.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" width="600" height="450" decoding="async">
+                </div>
+                <div class="card__body">
+                  <h3>Playa y tortugas</h3>
+                  <p class="card__place">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+                    Tortuguero
+                  </p>
+                  
+                  <div class="card__footer">
+                    <p class="price"><span class="price__from">Desde</span> $180</p>
+                    <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Playa y tortugas</span></a>
+                  </div>
+                </div>
+              </article>
+            </li>
+
+            <li>
+              <article class="card">
+                <div class="card__media">
+                  <span class="badge">Urbano</span>
+                  <img class="card__img" src="https://preview.redd.it/trevor-is-gone-so-why-cant-we-buy-vanilla-unicorn-v0-o83rmmybfo8f1.jpeg?auto=webp&s=c0517dc6d3661d94593c473b95f263248f76ea8f" alt="" width="600" height="450" decoding="async">
+                </div>
+                <div class="card__body">
+                  <h3>El tacon</h3>
+                  <p class="card__place">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+                    Los santos
+                  </p>
+                 
+                  <div class="card__footer">
+                    <p class="price"><span class="price__from">Desde</span> $50</p>
+                    <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Sabores de Heredia</span></a>
+                  </div>
+                </div>
+              </article>
+            </li>
+        </ul>
+
+        <nav aria-label="Paginación">
+          <ul class="pagination">
+            <li><a class="pagination__link" href="#" aria-label="Página anterior"><span aria-hidden="true">‹</span></a></li>
+            <li><a class="pagination__link" href="catalogo.html?pagina=1" aria-current="page"><span class="visually-hidden">Página </span>1</a></li>
+            <li><a class="pagination__link" href="catalogo.html?pagina=2"><span class="visually-hidden">Página </span>2</a></li>
+            <li><a class="pagination__link" href="catalogo.html?pagina=3"><span class="visually-hidden">Página </span>3</a></li>
+            <li><a class="pagination__link" href="catalogo.html?pagina=4"><span class="visually-hidden">Página </span>4</a></li>
+            <li><a class="pagination__link" href="catalogo.html?pagina=2" aria-label="Página siguiente"><span aria-hidden="true">›</span></a></li>
+          </ul>
+        </nav>
+
+        <div class="empty" id="sin-resultados" role="status">
+          <h2 class="empty__title">No encontramos paquetes con esos filtros</h2>
+          <p class="text-muted">Pruebe quitando algún filtro o ampliando el rango de precio.</p>
+          <a class="btn btn--primary" href="catalogo.html">Limpiar filtros</a>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p class="site-footer__brand">Malpariditos Tours</p>
+      <nav aria-label="Pie de página">
+        <ul class="site-footer__list">
+          <li><a href="#">Contacto</a></li>
+          <li><a href="#">Redes</a></li>
+          <li><a href="#">Términos</a></li>
+          <li><a href="#">Privacidad</a></li>
+          <li><a href="#">Accesibilidad</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module" src="modules/main.js"></script>
+</body>
+</html>
