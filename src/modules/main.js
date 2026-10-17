@@ -1,4 +1,6 @@
- const toggle = document.querySelector(".nav-toggle");
+import { initCatalogo } from "./views/catalogo.js";
+
+const toggle = document.querySelector(".nav-toggle");
 const menu = document.getElementById("menu-principal");
 
 const setMenu = (open) => {
@@ -78,3 +80,5 @@ const sortSelect = document.getElementById("orden");
 if (sortSelect) {
   sortSelect.addEventListener("change", () => sortSelect.form.requestSubmit());
 }
+
+initCatalogo();
