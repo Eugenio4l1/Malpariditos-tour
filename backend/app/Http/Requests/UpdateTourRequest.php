@@ -66,9 +66,11 @@ class UpdateTourRequest extends FormRequest
             'categoria_id.integer' => 'La categoría no es válida.',
             'categoria_id.exists' => 'La categoría seleccionada no existe.',
             'nombre.required' => 'El nombre del tour es obligatorio.',
+            'nombre.string' => 'El nombre debe ser texto.',
             'nombre.min' => 'El nombre debe tener al menos :min caracteres.',
             'nombre.max' => 'El nombre no puede superar los :max caracteres.',
             'nombre.unique' => 'Ya existe un tour registrado con ese nombre.',
+            'descripcion.string' => 'La descripción debe ser texto.',
             'descripcion.max' => 'La descripción no puede superar los :max caracteres.',
             'precio.required' => 'El precio es obligatorio.',
             'precio.numeric' => 'El precio debe ser un número.',
@@ -79,6 +81,7 @@ class UpdateTourRequest extends FormRequest
             'duracion_horas.min' => 'La duración mínima es de :min hora.',
             'duracion_horas.max' => 'La duración máxima es de :max horas.',
             'estado.required' => 'El estado es obligatorio.',
+            'estado.string' => 'El estado debe ser texto.',
             'estado.in' => 'El estado debe ser "activo" o "inactivo".',
         ];
     }

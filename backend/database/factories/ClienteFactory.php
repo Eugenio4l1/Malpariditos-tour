@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
-
+use App\Models\User;
 class ClienteFactory extends Factory
 {
     public function definition(): array
@@ -23,4 +23,12 @@ class ClienteFactory extends Factory
             'password' => Hash::make($password),
         ]);
     }
+    public function paraUsuario(User $user): static
+{
+    return $this->state(fn (array $attributes) => [
+        'user_id' => $user->id,
+        'nombre' => $user->name,
+        'email' => $user->email,
+    ]);
+}
 }

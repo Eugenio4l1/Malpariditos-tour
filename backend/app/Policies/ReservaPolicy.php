@@ -5,74 +5,50 @@ namespace App\Policies;
 use App\Models\Reserva;
 use App\Models\User;
 
+
 class ReservaPolicy
 {
-    /**
-     * Los administradores y guías pueden consultar cualquier reserva.
-     * Un cliente solo puede consultar sus propias reservas.
-     */
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'guia', 'cliente'], true);
+        return in_array($user->role, [User::ROL_ADMIN, User::ROL_GUIA, User::ROL_CLIENTE], true);
     }
 
-    /**
-     * Los administradores y guías pueden consultar cualquier reserva.
-     * Un cliente solo puede consultar sus propias reservas.
-     */
     public function view(User $user, Reserva $reserva): bool
     {
-        if (in_array($user->role, ['admin', 'guia'], true)) {
+        if (in_array($user->role, [User::ROL_ADMIN, User::ROL_GUIA], true)) {
             return true;
         }
 
-        return $user->role === 'cliente'
-            && $user->cliente?->id === $reserva->cliente_id;
+        return $this->esDuenio($user, $reserva);
     }
 
-    /**
-     * Crear reservas requiere un usuario con rol de cliente.
-     */
     public function create(User $user): bool
     {
-        return $user->role === 'cliente'
+        return $user->role === User::ROL_CLIENTE
             && $user->cliente !== null;
     }
 
-    /**
-     * Los administradores y guías pueden modificar cualquier reserva.
-     * Un cliente solo puede modificar sus propias reservas.
-     */
     public function update(User $user, Reserva $reserva): bool
     {
-        if (in_array($user->role, ['admin', 'guia'], true)) {
-            return true;
-        }
-
-        return $user->role === 'cliente'
-            && $user->cliente?->id === $reserva->cliente_id;
+        return $user->role === User::ROL_ADMIN
+            || $this->esDuenio($user, $reserva);
     }
 
-    /**
-     * Los administradores y guías pueden eliminar cualquier reserva.
-     * Un cliente solo puede eliminar sus propias reservas.
-     */
     public function delete(User $user, Reserva $reserva): bool
     {
-        if (in_array($user->role, ['admin', 'guia'], true)) {
-            return true;
-        }
-
-        return $user->role === 'cliente'
-            && $user->cliente?->id === $reserva->cliente_id;
+        return $user->role === User::ROL_ADMIN
+            || $this->esDuenio($user, $reserva);
     }
 
-    /**
-     * Cambiar el estado de una reserva es una operación administrativa
-     * o propia del rol de guía.
-     */
     public function changeState(User $user, Reserva $reserva): bool
     {
-        return in_array($user->role, ['admin', 'guia'], true);
+        return in_array($user->role, [User::ROL_ADMIN, User::ROL_GUIA], true);
+    }
+
+    private function esDuenio(User $user, Reserva $reserva): bool
+    {
+        return $user->role === User::ROL_CLIENTE
+            && $user->cliente !== null
+            && $user->cliente->id === $reserva->cliente_id;
     }
 }

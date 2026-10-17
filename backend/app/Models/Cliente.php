@@ -10,7 +10,7 @@ class Cliente extends Model
     use HasFactory;
 
     protected $table = 'clientes';
-    protected $fillable = ['nombre', 'email', 'telefono', 'password'];
+    protected $fillable = ['user_id', 'nombre', 'email', 'telefono', 'password'];
     protected $hidden = ['password'];
 
     public function reservas()
@@ -22,4 +22,8 @@ class Cliente extends Model
     {
         return $this->hasMany(Valoracion::class);
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             TourSeeder::class,
             ReservaSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

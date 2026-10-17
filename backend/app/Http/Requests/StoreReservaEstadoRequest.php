@@ -32,6 +32,7 @@ class StoreReservaEstadoRequest extends FormRequest
     {
         return [
             'estado.required' => 'El estado es obligatorio.',
+            'estado.string' => 'El estado debe ser texto.',
             'estado.in' => 'El estado debe ser "confirmada" o "cancelada".',
         ];
     }

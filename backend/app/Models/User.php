@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -15,25 +15,46 @@ use Laravel\Sanctum\HasApiTokens;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
+  
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * Get the client associated with this authenticated user.
-     *
-     * The current domain model identifies clients by their unique email.
-     * The authenticated user uses the same email as the identity bridge.
-     */
-    public function cliente()
-    {
-        return $this->hasOne(Cliente::class, 'email', 'email');
-    }
+   
+    public const ROL_ADMIN = 'admin';
+public const ROL_GUIA = 'guia';
+public const ROL_CLIENTE = 'cliente';
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+
+public const CAPACIDADES_POR_ROL = [
+    self::ROL_ADMIN => [
+        'tours:crear', 'tours:editar', 'tours:eliminar',
+        'reservas:ver', 'reservas:editar', 'reservas:eliminar', 'reservas:estado',
+        'clientes:ver',
+    ],
+    self::ROL_GUIA => [
+        'reservas:ver', 'reservas:estado',
+        'clientes:ver',
+    ],
+    self::ROL_CLIENTE => [
+        'reservas:ver', 'reservas:crear', 'reservas:editar', 'reservas:eliminar',
+        'clientes:ver',
+    ],
+];
+
+protected $attributes = [
+    'role' => self::ROL_CLIENTE,
+];
+
+/** @return array<int, string> */
+public function capacidades(): array
+{
+    return self::CAPACIDADES_POR_ROL[$this->role] ?? [];
+}
+
+
+public function cliente()
+{
+    return $this->hasOne(Cliente::class, 'user_id');
+}
     protected function casts(): array
     {
         return [

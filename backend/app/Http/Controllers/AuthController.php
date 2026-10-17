@@ -4,25 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Models\Cliente;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
     /**
-     * Registra una nueva persona usuaria y genera su token de API.
+     * Registra una nueva persona usuaria, crea su cliente vinculado
+     * y genera su token de API con las capacidades de su rol.
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $user = User::create([
-            'name' => $request->validated('name'),
-            'email' => $request->validated('email'),
-            'password' => $request->validated('password'),
-        ]);
+        $user = DB::transaction(function () use ($request) {
+            $user = User::create([
+                'name' => $request->validated('name'),
+                'email' => $request->validated('email'),
+                'password' => $request->validated('password'),
+                'role' => User::ROL_CLIENTE, // el rol nunca viene de la petición HTTP
+            ]);
 
-        $token = $user->createToken('api')->plainTextToken;
+            // Cliente propio, vinculado por llave foránea (no por correo).
+            Cliente::create([
+                'user_id' => $user->id,
+                'nombre' => $user->name,
+                'email' => $user->email,
+                'password' => $user->password, // ya viene hasheado por el cast
+            ]);
+
+            return $user;
+        });
+
+        $token = $user->createToken('api', $user->capacidades())->plainTextToken;
 
         return response()->json([
             'mensaje' => 'Usuario registrado correctamente.',
@@ -38,7 +54,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Inicia sesión y genera un token de API.
+     * Inicia sesión y genera un token de API con las capacidades de su rol.
      */
     public function login(LoginRequest $request): JsonResponse
     {
@@ -51,7 +67,7 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $token = $user->createToken('api')->plainTextToken;
+        $token = $user->createToken('api', $user->capacidades())->plainTextToken;
 
         return response()->json([
             'mensaje' => 'Inicio de sesión exitoso.',

@@ -19,7 +19,7 @@ class RegisterRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'min:2', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email', 'unique:clientes,email'],
             'password' => [
                 'required',
                 'string',
@@ -44,10 +44,13 @@ class RegisterRequest extends FormRequest
             'name.max' => 'El nombre no puede superar :max caracteres.',
 
             'email.required' => 'El correo electrónico es obligatorio.',
+            'email.string' => 'El correo electrónico debe ser texto.',
             'email.email' => 'El correo electrónico no tiene un formato válido.',
+            'email.max' => 'El correo electrónico no puede superar :max caracteres.',
             'email.unique' => 'El correo electrónico ya está registrado.',
 
             'password.required' => 'La contraseña es obligatoria.',
+            'password.string' => 'La contraseña debe ser texto.',
             'password.confirmed' => 'La confirmación de contraseña no coincide.',
         ];
     }

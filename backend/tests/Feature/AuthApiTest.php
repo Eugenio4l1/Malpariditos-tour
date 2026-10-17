@@ -235,29 +235,54 @@ class AuthApiTest extends TestCase
             ]);
     }
 
-    public function test_token_valido_puede_acceder_a_recurso_protegido(): void
-    {
-        $email = 'tokenvalido@example.com';
+ public function test_token_valido_puede_acceder_a_recurso_protegido(): void
+{
+    $user = User::factory()->create([
+        'email' => 'tokenvalido@example.com',
+        'role' => 'cliente',
+    ]);
 
-        $user = User::factory()->create([
-            'email' => $email,
-            'role' => 'cliente',
+    Cliente::factory()->paraUsuario($user)->create();
+
+    $token = $user->createToken('api', $user->capacidades())->plainTextToken;
+
+    $this
+        ->withToken($token)
+        ->getJson('/api/reservas')
+        ->assertOk()
+        ->assertJsonStructure([
+            'data',
+            'links',
+            'meta',
         ]);
+}
+    public function test_registro_crea_un_cliente_vinculado_y_un_token_sin_comodin(): void
+{
+    $token = $this->postJson('/api/register', [
+        'name' => 'Ana Rojas',
+        'email' => 'ana@example.com',
+        'password' => 'Prueba123!',
+        'password_confirmation' => 'Prueba123!',
+    ])->assertCreated()->json('data.token');
 
-        Cliente::factory()->create([
-            'email' => $email,
-        ]);
+    $user = User::where('email', 'ana@example.com')->firstOrFail();
 
-        $token = $user->createToken('api')->plainTextToken;
+    $this->assertSame('cliente', $user->role);
+    $this->assertDatabaseHas('clientes', ['user_id' => $user->id, 'email' => 'ana@example.com']);
+    $this->assertNotContains('*', \Laravel\Sanctum\PersonalAccessToken::findToken($token)->abilities);
+}
 
-        $this
-            ->withToken($token)
-            ->getJson('/api/reservas')
-            ->assertOk()
-            ->assertJsonStructure([
-                'data',
-                'links',
-                'meta',
-            ]);
-    }
+public function test_registro_rechaza_el_correo_de_un_cliente_existente(): void
+{
+    Cliente::factory()->create(['email' => 'cliente@example.com']);
+
+    $this->postJson('/api/register', [
+        'name' => 'Intruso',
+        'email' => 'cliente@example.com',
+        'password' => 'Prueba123!',
+        'password_confirmation' => 'Prueba123!',
+    ])->assertStatus(422)->assertJsonValidationErrors('email', 'errores');
+
+    $this->assertDatabaseMissing('users', ['email' => 'cliente@example.com']);
+}
 }

@@ -10,6 +10,7 @@ use App\Models\Tour;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class ApiRestTest extends TestCase
@@ -27,11 +28,14 @@ class ApiRestTest extends TestCase
     }
 
     /**
-     * Autentica las siguientes peticiones como un usuario del rol indicado.
+     * Autentica las siguientes peticiones como un usuario del rol indicado,
+     * con un token que lleva solo las capacidades de ese rol.
      */
     private function autenticarComo(string $rol): void
     {
-        $this->actingAs($this->usuarioConRol($rol), 'sanctum');
+        $usuario = $this->usuarioConRol($rol);
+
+        Sanctum::actingAs($usuario, $usuario->capacidades());
     }
 
     // ---------- 201 + Location ----------
@@ -56,30 +60,29 @@ class ApiRestTest extends TestCase
     }
 
     public function test_crear_reserva_devuelve_201_con_location(): void
-{
-    $usuario = User::factory()->create([
-        'role' => 'cliente',
-    ]);
+    {
+        $usuario = User::factory()->create([
+            'role' => 'cliente',
+        ]);
 
-    $cliente = Cliente::factory()->create([
-        'email' => $usuario->email,
-    ]);
+        // El cliente se vincula por user_id, no por correo.
+        $cliente = Cliente::factory()->paraUsuario($usuario)->create();
 
-    $this->actingAs($usuario, 'sanctum');
+        Sanctum::actingAs($usuario, $usuario->capacidades());
 
-    $salida = SalidaTour::factory()->create(['cupo_maximo' => 10]);
+        $salida = SalidaTour::factory()->create(['cupo_maximo' => 10]);
 
-    $respuesta = $this->postJson('/api/reservas', [
-        'cliente_id' => $cliente->id,
-        'salida_tour_id' => $salida->id,
-        'cantidad_personas' => 2,
-        'fecha_reserva' => now()->toDateString(),
-    ]);
+        $respuesta = $this->postJson('/api/reservas', [
+            'cliente_id' => $cliente->id,
+            'salida_tour_id' => $salida->id,
+            'cantidad_personas' => 2,
+            'fecha_reserva' => now()->toDateString(),
+        ]);
 
-    $respuesta->assertCreated()->assertJsonPath('data.estado', 'pendiente');
-    $id = $respuesta->json('data.id');
-    $this->assertStringEndsWith("/api/reservas/{$id}", $respuesta->headers->get('Location'));
-}
+        $respuesta->assertCreated()->assertJsonPath('data.estado', 'pendiente');
+        $id = $respuesta->json('data.id');
+        $this->assertStringEndsWith("/api/reservas/{$id}", $respuesta->headers->get('Location'));
+    }
 
     // ---------- 204 / 409 ----------
 

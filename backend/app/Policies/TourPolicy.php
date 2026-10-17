@@ -7,27 +7,19 @@ use App\Models\User;
 
 class TourPolicy
 {
-    /**
-     * Crear tours requiere permisos de administración o guía.
-     */
+    /** La gestión del catálogo es exclusiva de la administración. */
     public function create(User $user): bool
     {
-        return in_array($user->role, ['admin', 'guia'], true);
+        return $user->role === User::ROL_ADMIN;
     }
 
-    /**
-     * Actualizar tours requiere permisos de administración o guía.
-     */
     public function update(User $user, Tour $tour): bool
     {
-        return in_array($user->role, ['admin', 'guia'], true);
+        return $user->role === User::ROL_ADMIN;
     }
 
-    /**
-     * Eliminar tours requiere permisos de administración o guía.
-     */
     public function delete(User $user, Tour $tour): bool
     {
-        return in_array($user->role, ['admin', 'guia'], true);
+        return $user->role === User::ROL_ADMIN;
     }
 }
