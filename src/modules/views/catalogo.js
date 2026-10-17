@@ -84,9 +84,15 @@ function renderError(error) {
 
 function render(state) {
   elements.empty.hidden = state.status !== "empty";
-  elements.list.hidden = ["loading", "empty", "error"].includes(state.status);
+  elements.list.hidden = state.status === "empty";
   elements.pagination.hidden = state.status !== "success";
-  if (elements.count) elements.count.textContent = state.status === "loading" ? "Cargando paquetes…" : `${state.total} paquetes encontrados`;
+  if (elements.count) {
+    elements.count.textContent = state.status === "loading"
+      ? "Cargando paquetes…"
+      : state.status === "error"
+        ? "No se pudo cargar el catálogo."
+        : `${state.total} paquetes encontrados`;
+  }
 
   if (state.status === "loading") {
     elements.list.innerHTML = '<li class="catalog-message" aria-live="polite"><p>Cargando paquetes…</p></li>';
