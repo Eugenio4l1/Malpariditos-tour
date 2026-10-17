@@ -18,6 +18,10 @@
   gap: var(--space-md);
 }
 
+.catalog-search {
+  flex: 1 1 15rem;
+}
+
 .sort {
   flex: 1 1 12rem;
 }

@@ -3,12 +3,16 @@ import { setTourState, subscribeToTourState } from "../state/tourState.js";
 
 const elements = {
   count: document.querySelector("[data-catalog-count]"),
+  search: document.getElementById("catalog-search"),
+  searchInput: document.getElementById("catalog-search-input"),
   list: document.querySelector(".card-grid"),
   pagination: document.querySelector(".pagination"),
   empty: document.getElementById("sin-resultados"),
 };
 
 let currentController = null;
+let searchTimer = null;
+let requestSequence = 0;
 const fallbackImages = [
   "https://images.pexels.com/photos/39402239/pexels-photo-39402239.jpeg?auto=compress&cs=tinysrgb&w=600",
   "https://images.pexels.com/photos/11032583/pexels-photo-11032583.jpeg?auto=compress&cs=tinysrgb&w=600",
@@ -97,17 +101,19 @@ function render(state) {
   }
 }
 
-async function loadTours(page = 1) {
+async function loadTours(page = 1, search = elements.searchInput?.value.trim() || "") {
+  const sequence = ++requestSequence;
   currentController?.abort();
   currentController = new AbortController();
   setTourState({ status: "loading", error: null, page });
   try {
     const payload = await apiClient.get("tours", {
       signal: currentController.signal,
-      query: { page, per_page: 6, sort_by: "created_at", sort_dir: "desc" },
+      query: { page, per_page: 6, sort_by: "created_at", sort_dir: "desc", buscar: search },
     });
     const meta = payload?.meta || {};
     const tours = Array.isArray(payload?.data) ? payload.data : [];
+    if (sequence !== requestSequence) return;
     setTourState({
       status: tours.length ? "success" : "empty",
       tours,
@@ -116,13 +122,20 @@ async function loadTours(page = 1) {
       total: Number(meta.total || tours.length),
     });
   } catch (error) {
-    if (!error.isCancelled) setTourState({ status: "error", error });
+    if (!error.isCancelled && sequence === requestSequence) setTourState({ status: "error", error });
   }
 }
 
 export function initCatalogo() {
   if (!elements.list || !elements.pagination || !elements.empty) return;
+  const initialSearch = new URLSearchParams(window.location.search).get("buscar") || "";
+  if (elements.searchInput) elements.searchInput.value = initialSearch;
   subscribeToTourState(render);
+  elements.search?.addEventListener("submit", (event) => event.preventDefault());
+  elements.searchInput?.addEventListener("input", () => {
+    window.clearTimeout(searchTimer);
+    searchTimer = window.setTimeout(() => loadTours(1), 300);
+  });
   elements.pagination.addEventListener("click", (event) => {
     const button = event.target.closest("[data-page]");
     if (button && !button.disabled) loadTours(Number(button.dataset.page));
