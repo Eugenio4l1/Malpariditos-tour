@@ -80,6 +80,7 @@ class AuthApiTest extends TestCase
         User::factory()->create([
             'email' => 'login@example.com',
             'password' => 'Prueba123!',
+            'role' => User::ROL_ADMIN,
         ]);
 
         $response = $this->postJson('/api/login', [
@@ -96,10 +97,16 @@ class AuthApiTest extends TestCase
                         'id',
                         'name',
                         'email',
+                        'role',
+                        'capacidades',
                     ],
                     'token',
                 ],
             ]);
+
+        $response
+            ->assertJsonPath('data.usuario.role', User::ROL_ADMIN)
+            ->assertJsonPath('data.usuario.capacidades', User::CAPACIDADES_POR_ROL[User::ROL_ADMIN]);
 
         $this->assertDatabaseCount('personal_access_tokens', 1);
     }

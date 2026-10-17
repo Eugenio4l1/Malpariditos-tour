@@ -1,3 +1,5 @@
+import { clearAuthSession, getAuthSession } from "../auth/authState.js";
+
 export class ApiError extends Error {
   constructor(message, { status = 0, code = null, details = null, kind = "http" } = {}) {
     super(message);
@@ -44,14 +46,41 @@ export class ApiClient {
     return this.request(url, { signal });
   }
 
-  async request(url, { signal } = {}) {
+  async post(path, body, options = {}) {
+    return this.request(this.buildUrl(path), { ...options, method: "POST", body });
+  }
+
+  async put(path, body, options = {}) {
+    return this.request(this.buildUrl(path), { ...options, method: "PUT", body });
+  }
+
+  async patch(path, body, options = {}) {
+    return this.request(this.buildUrl(path), { ...options, method: "PATCH", body });
+  }
+
+  buildUrl(path) {
+    return new URL(`${this.baseUrl}/${String(path).replace(/^\/+/, "")}`);
+  }
+
+  async request(url, { signal, method = "GET", body } = {}) {
+    this.syncTokenFromStorage();
     const headers = { Accept: "application/json" };
     if (this.token) headers.Authorization = `Bearer ${this.token}`;
+    if (body !== undefined) headers["Content-Type"] = "application/json";
 
     try {
-      const response = await fetch(url, { method: "GET", headers, signal });
+      const response = await fetch(url, {
+        method,
+        headers,
+        body: body === undefined ? undefined : JSON.stringify(body),
+        signal,
+      });
       const payload = await this.parseResponse(response);
       if (!response.ok) {
+        if (response.status === 401) {
+          this.clearToken();
+          clearAuthSession();
+        }
         throw new ApiError(
           payload?.mensaje || payload?.message || `La solicitud falló (${response.status}).`,
           {
@@ -70,6 +99,11 @@ export class ApiClient {
         details: error,
       });
     }
+  }
+
+  syncTokenFromStorage() {
+    const storedSession = sessionStorage.getItem("malpariditos.auth");
+    if (storedSession !== null) this.token = getAuthSession()?.token || null;
   }
 
   async parseResponse(response) {

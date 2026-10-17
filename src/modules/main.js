@@ -1,4 +1,26 @@
 import { initCatalogo } from "./views/catalogo.js";
+import { apiClient } from "./api/ApiClient.js";
+import { getAuthSession, hasAdminAccess } from "./auth/authState.js";
+
+const authSession = getAuthSession();
+if (authSession?.token) apiClient.setToken(authSession.token);
+
+const authActions = document.querySelector(".site-nav__actions");
+if (authActions) {
+  const loginLink = authActions.querySelector("a");
+  if (loginLink) {
+    loginLink.href = "login.html";
+    loginLink.textContent = authSession ? "Sesión activa" : "Ingresar";
+  }
+
+  if (hasAdminAccess()) {
+    const adminLink = document.createElement("a");
+    adminLink.className = "btn btn--primary";
+    adminLink.href = "admin.html";
+    adminLink.textContent = "Administrar tours";
+    authActions.append(adminLink);
+  }
+}
 
 const toggle = document.querySelector(".nav-toggle");
 const menu = document.getElementById("menu-principal");
