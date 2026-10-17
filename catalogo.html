@@ -64,7 +64,7 @@
           </ol>
         </nav>
         <h1>Paquetes de tour</h1>
-        <p class="text-small text-muted" role="status">24 paquetes encontrados</p>
+        <p class="text-small text-muted" role="status" data-catalog-count>Cargando paquetes…</p>
       </div>
 
       <div class="catalog-tools">
@@ -162,136 +162,10 @@
       <section class="catalog__results" aria-labelledby="titulo-resultados">
         <h2 class="visually-hidden" id="titulo-resultados">Lista de paquetes</h2>
 
-        <ul class="card-grid">
-            <li>
-              <article class="card">
-                <div class="card__media">
-                  <span class="badge">Urbano</span>
-                  <img class="card__img" src="https://images.pexels.com/photos/39402239/pexels-photo-39402239.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" width="600" height="450" fetchpriority="high" decoding="async">
-                </div>
-                <div class="card__body">
-                  <h3>Tour histórico San José</h3>
-                  <p class="card__place">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
-                    San José
-                  </p>
-                  
-                  <div class="card__footer">
-                    <p class="price"><span class="price__from">Desde</span> $45</p>
-                    <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Tour histórico San José</span></a>
-                  </div>
-                </div>
-              </article>
-            </li>
-
-            <li>
-              <article class="card">
-                <div class="card__media">
-                  <span class="badge">Rural</span>
-                  <img class="card__img" src="https://images.pexels.com/photos/11032583/pexels-photo-11032583.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" width="600" height="450" fetchpriority="high" decoding="async">
-                </div>
-                <div class="card__body">
-                  <h3>Volcán y aguas termales</h3>
-                  <p class="card__place">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
-                    La Fortuna
-                  </p>
-                  
-                  <div class="card__footer">
-                    <p class="price"><span class="price__from">Desde</span> $120</p>
-                    <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Volcán y aguas termales</span></a>
-                  </div>
-                </div>
-              </article>
-            </li>
-
-            <li>
-              <article class="card">
-                <div class="card__media">
-                  <span class="badge">Urbano</span>
-                  <img class="card__img" src="https://images.pexels.com/photos/14624137/pexels-photo-14624137.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" width="600" height="450" decoding="async">
-                </div>
-                <div class="card__body">
-                  <h3>Arte y café en Cartago</h3>
-                  <p class="card__place">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
-                    Cartago
-                  </p>
-                  
-                  <div class="card__footer">
-                    <p class="price"><span class="price__from">Desde</span> $60</p>
-                    <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Arte y café en Cartago</span></a>
-                  </div>
-                </div>
-              </article>
-            </li>
-
-            <li>
-              <article class="card">
-                <div class="card__media">
-                  <span class="badge">Rural</span>
-                  <img class="card__img" src="https://images.pexels.com/photos/30603643/pexels-photo-30603643.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" width="600" height="450" decoding="async">
-                </div>
-                <div class="card__body">
-                  <h3>Bosque nuboso</h3>
-                  <p class="card__place">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
-                    Monteverde
-                  </p>
-                  
-                  <div class="card__footer">
-                    <p class="price"><span class="price__from">Desde</span> $95</p>
-                    <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Bosque nuboso</span></a>
-                  </div>
-                </div>
-              </article>
-            </li>
-
-            <li>
-              <article class="card">
-                <div class="card__media">
-                  <span class="badge">Rural</span>
-                  <img class="card__img" src="https://images.pexels.com/photos/35246138/pexels-photo-35246138.jpeg?auto=compress&cs=tinysrgb&w=600" alt="" width="600" height="450" decoding="async">
-                </div>
-                <div class="card__body">
-                  <h3>Playa y tortugas</h3>
-                  <p class="card__place">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
-                    Tortuguero
-                  </p>
-                  
-                  <div class="card__footer">
-                    <p class="price"><span class="price__from">Desde</span> $180</p>
-                    <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Playa y tortugas</span></a>
-                  </div>
-                </div>
-              </article>
-            </li>
-
-            <li>
-              <article class="card">
-                <div class="card__media">
-                  <span class="badge">Urbano</span>
-                  <img class="card__img" src="https://preview.redd.it/trevor-is-gone-so-why-cant-we-buy-vanilla-unicorn-v0-o83rmmybfo8f1.jpeg?auto=webp&s=c0517dc6d3661d94593c473b95f263248f76ea8f" alt="" width="600" height="450" decoding="async">
-                </div>
-                <div class="card__body">
-                  <h3>El tacón</h3>
-                  <p class="card__place">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
-                    Los santos
-                  </p>
-                 
-                  <div class="card__footer">
-                    <p class="price"><span class="price__from">Desde</span> $50</p>
-                    <a class="btn btn--primary" href="paquete.html">Ver paquete<span class="visually-hidden">: Sabores de Heredia</span></a>
-                  </div>
-                </div>
-              </article>
-            </li>
-        </ul>
+<ul class="card-grid" aria-live="polite"></ul>
 
         <nav aria-label="Paginación">
-          <ul class="pagination">
+          <ul class="pagination" hidden>
             <li><a class="pagination__link" href="#" aria-label="Página anterior"><span aria-hidden="true">‹</span></a></li>
             <li><a class="pagination__link" href="catalogo.html?pagina=1" aria-current="page"><span class="visually-hidden">Página </span>1</a></li>
             <li><a class="pagination__link" href="catalogo.html?pagina=2"><span class="visually-hidden">Página </span>2</a></li>
@@ -301,7 +175,7 @@
           </ul>
         </nav>
 
-        <div class="empty" id="sin-resultados" role="status">
+        <div class="empty" id="sin-resultados" role="status" hidden>
           <h2 class="empty__title">No encontramos paquetes con esos filtros</h2>
           <p class="text-muted">Pruebe quitando algún filtro o ampliando el rango de precio.</p>
           <a class="btn btn--primary" href="catalogo.html">Limpiar filtros</a>
