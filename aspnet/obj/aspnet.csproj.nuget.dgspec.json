@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\sarit\\OneDrive\\Escritorio\\Malpariditos-tour\\aspnet\\aspnet.csproj": {}
+    "C:\\Users\\sarit\\Malpariditos-tour-limpio\\aspnet\\aspnet.csproj": {}
   },
   "projects": {
-    "C:\\Users\\sarit\\OneDrive\\Escritorio\\Malpariditos-tour\\aspnet\\aspnet.csproj": {
+    "C:\\Users\\sarit\\Malpariditos-tour-limpio\\aspnet\\aspnet.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sarit\\OneDrive\\Escritorio\\Malpariditos-tour\\aspnet\\aspnet.csproj",
+        "projectUniqueName": "C:\\Users\\sarit\\Malpariditos-tour-limpio\\aspnet\\aspnet.csproj",
         "projectName": "aspnet",
-        "projectPath": "C:\\Users\\sarit\\OneDrive\\Escritorio\\Malpariditos-tour\\aspnet\\aspnet.csproj",
+        "projectPath": "C:\\Users\\sarit\\Malpariditos-tour-limpio\\aspnet\\aspnet.csproj",
         "packagesPath": "C:\\Users\\sarit\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sarit\\OneDrive\\Escritorio\\Malpariditos-tour\\aspnet\\obj\\",
+        "outputPath": "C:\\Users\\sarit\\Malpariditos-tour-limpio\\aspnet\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\sarit\\AppData\\Roaming\\NuGet\\NuGet.Config"
