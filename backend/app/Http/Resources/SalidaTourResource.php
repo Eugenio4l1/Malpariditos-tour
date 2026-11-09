@@ -41,6 +41,11 @@ class SalidaTourResource extends JsonResource
              * @example "programada"
              */
             'estado' => $this->estado,
+            /**
+             * Cupo disponible de la salida.
+             * @example 5
+             */
+            'cupo_disponible' => $this->cupoDisponible(),
         ];
     }
 }

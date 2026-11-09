@@ -20,7 +20,7 @@ class SalidaTour extends Model
 
     public function reservas()
     {
-        return $this->hasMany(Reserva::class);
+        return $this->hasMany(Reserva::class, 'salida_tour_id');
     }
 
     public function llegadaTour()
@@ -34,4 +34,15 @@ class SalidaTour extends Model
             ->withPivot('rol', 'fecha_asignacion', 'estado')
             ->withTimestamps();
     }
+    
+    public function cupoDisponible(): int
+{
+    $ocupados = $this->reservas()
+        ->where('estado', '!=', 'cancelada')
+        ->sum('cantidad_personas');
+
+    return max(0, $this->cupo_maximo - $ocupados);
+}
+   
+
 }

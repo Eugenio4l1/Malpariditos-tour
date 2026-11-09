@@ -32,4 +32,6 @@ class TourSalidaController extends Controller
     {
         return SalidaTourResource::collection($this->service->listSalidas($tour, $request->query()));
     }
+
+    
 }

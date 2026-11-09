@@ -1,0 +1,10 @@
+:root {
+  --ion-color-primary: #24609c;
+  --ion-color-primary-shade: #1b4b7c;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-background-color: #f6f1e4;
+  --ion-text-color: #1f2933;
+  --ion-safe-area-top: env(safe-area-inset-top);
+  --ion-safe-area-bottom: env(safe-area-inset-bottom);
+}
+.centrado { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 32px 16px; text-align: center; }
