@@ -1,0 +1,4 @@
+allowBuilds:
+  '@parcel/watcher': false
+  '@scarf/scarf': set this to true or false
+  better-sqlite3: false
