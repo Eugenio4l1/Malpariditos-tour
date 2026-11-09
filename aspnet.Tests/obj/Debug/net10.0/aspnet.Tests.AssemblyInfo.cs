@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("aspnet.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fb8bfe7574c4f88e922030980f6f429248436d4b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+95cfe27c7afd0fe6ea8abd6008bf2051500cb73c")]
 [assembly: System.Reflection.AssemblyProductAttribute("aspnet.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("aspnet.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
