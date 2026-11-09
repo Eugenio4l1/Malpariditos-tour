@@ -379,19 +379,4 @@ Una implementación cumple el contrato solo si:
 
 ---
 
-## 10. Registro de cambios
 
-| Fecha | Cambio | Motivo | Acordado por |
-|---|---|---|---|
-| 2026-11-08 | Se adopta como contrato el comportamiento de la API Laravel entregada (Lab 4 a 6): envoltorio `data`, filtros `buscar`, `estado`, `categoria_id`, `precio_min`, `precio_max`, `sort_by` y `sort_dir`, códigos de error de Laravel, `PUT` y `PATCH`, 409 por reservas activas. | Laravel ya está entregado y lo consume el frontend; así entra al comparativo sin modificarse. | *[nombres]* |
-| 2026-11-08 | Desviación respecto de la plantilla del enunciado: listado y detalle públicos, `buscar` en lugar de `q`. | Se respeta el comportamiento entregado. | *[nombres]* |
-
----
-
-## 11. Responsables
-
-| Implementación | Responsable | Hito |
-|---|---|---|
-| Laravel 13 | *[nombre]* | Laboratorios 3 a 6 |
-| NestJS | *[nombre]* | Hito 1 |
-| ASP.NET Core 8 | *[nombre]* | Hito 2 |
