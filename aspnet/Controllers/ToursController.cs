@@ -22,53 +22,80 @@ public class ToursController : ControllerBase
 
     // GET: /api/tours
     [HttpGet]
-    public async Task<IActionResult> ObtenerTours(
-        [FromQuery(Name = "categoria_id")] int? categoriaId,
-        [FromQuery] string? estado,
-        [FromQuery(Name = "precio_min")] decimal? precioMin,
-        [FromQuery(Name = "precio_max")] decimal? precioMax,
-        [FromQuery(Name = "buscar")] string? buscar)
-    {
-        IQueryable<Tour> consulta = _context.Tours.AsNoTracking();
+    
+// GET: /api/tours?page=1&per_page=15
+[HttpGet]
+public async Task<IActionResult> ObtenerTours(
+    [FromQuery] int page = 1,
+    [FromQuery] int per_page = 15,
+    [FromQuery(Name = "categoria_id")] int? categoriaId = null,
+    [FromQuery] string? estado = null,
+    [FromQuery(Name = "precio_min")] decimal? precioMin = null,
+    [FromQuery(Name = "precio_max")] decimal? precioMax = null,
+    [FromQuery] string? buscar = null)
+{
+    const int TAMANO_MAXIMO = 50;
 
-        if (categoriaId.HasValue)
-            consulta = consulta.Where(t => t.CategoriaId == categoriaId.Value);
+    page = Math.Max(1, page);
+    per_page = Math.Clamp(per_page, 1, TAMANO_MAXIMO);
 
-        if (!string.IsNullOrWhiteSpace(estado))
-            consulta = consulta.Where(t => t.Estado == estado);
+    IQueryable<Tour> consulta = _context.Tours.AsNoTracking();
 
-        if (precioMin.HasValue)
-            consulta = consulta.Where(t => t.Precio >= precioMin.Value);
+    if (categoriaId.HasValue)
+        consulta = consulta.Where(t => t.CategoriaId == categoriaId.Value);
 
-        if (precioMax.HasValue)
-            consulta = consulta.Where(t => t.Precio <= precioMax.Value);
+    if (!string.IsNullOrWhiteSpace(estado))
+        consulta = consulta.Where(t => t.Estado == estado);
 
-        if (!string.IsNullOrWhiteSpace(buscar))
-            consulta = consulta.Where(t => t.Nombre.Contains(buscar));
+    if (precioMin.HasValue)
+        consulta = consulta.Where(t => t.Precio >= precioMin.Value);
 
-        var tours = await consulta
-            .OrderBy(t => t.Nombre)
-            .Select(t => new
+    if (precioMax.HasValue)
+        consulta = consulta.Where(t => t.Precio <= precioMax.Value);
+
+    if (!string.IsNullOrWhiteSpace(buscar))
+        consulta = consulta.Where(t => t.Nombre.Contains(buscar));
+
+    var total = await consulta.CountAsync();
+
+    var ultimaPagina = Math.Max(1, (int)Math.Ceiling((double)total / per_page));
+
+    var tours = await consulta
+        .OrderByDescending(t => t.CreatedAt)
+        .Skip((page - 1) * per_page)
+        .Take(per_page)
+        .Select(t => new
+        {
+            id = t.Id,
+            categoria_id = t.CategoriaId,
+            nombre = t.Nombre,
+            descripcion = t.Descripcion,
+            precio = t.Precio,
+            duracion_horas = t.DuracionHoras,
+            estado = t.Estado,
+            categoria = t.Categoria == null ? null : new
             {
-                id = t.Id,
-                categoria_id = t.CategoriaId,
-                nombre = t.Nombre,
-                descripcion = t.Descripcion,
-                precio = t.Precio,
-                duracion_horas = t.DuracionHoras,
-                estado = t.Estado,
-                categoria = t.Categoria == null ? null : new
-                {
-                    id = t.Categoria.Id,
-                    nombre = t.Categoria.Nombre
-                },
-                creado_en = t.CreatedAt,
-                actualizado_en = t.UpdatedAt
-            })
-            .ToListAsync();
+                id = t.Categoria.Id,
+                nombre = t.Categoria.Nombre
+            },
+            creado_en = t.CreatedAt,
+            actualizado_en = t.UpdatedAt
+        })
+        .ToListAsync();
 
-        return Ok(tours);
-    }
+    return Ok(new
+    {
+        data = tours,
+        meta = new
+        {
+            current_page = page,
+            per_page,
+            total,
+            last_page = ultimaPagina
+        }
+    });
+}
+
 
     // GET: /api/tours/{id}
     [HttpGet("{id:int}")]

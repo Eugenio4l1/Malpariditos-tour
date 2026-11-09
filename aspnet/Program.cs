@@ -13,6 +13,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Configuración de controladores y vistas
 builder.Services.AddControllersWithViews();
+builder.Services.AddOpenApi();
 
 // Configuración JWT
 var jwtKey = builder.Configuration["Jwt:Key"]
@@ -39,6 +40,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+app.MapOpenApi();
 
 if (!app.Environment.IsDevelopment())
 {

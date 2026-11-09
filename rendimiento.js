@@ -35,7 +35,6 @@ export default function () {
         BASE_URL,
         {
             headers: {
-                Authorization: `Bearer ${TOKEN}`,
                 Accept: 'application/json',
             },
         }
