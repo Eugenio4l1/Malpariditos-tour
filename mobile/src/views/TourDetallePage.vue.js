@@ -3,7 +3,7 @@
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { http, mensajeError } from '../services/http';
-
+import { onIonViewWillEnter } from '@ionic/vue';
 const route = useRoute();
 const router = useRouter();
 const tour = ref(null);
@@ -28,6 +28,7 @@ async function cargar() {
     }
 }
 onMounted(cargar);
+onIonViewWillEnter(cargar);
 const __VLS_ctx = {};
 let __VLS_components;
 let __VLS_intrinsics;
@@ -352,7 +353,7 @@ const __VLS_template = () => {
                 (s.fecha);
                 (s.hora);
                 __VLS_asFunctionalElement1(__VLS_intrinsics.p, __VLS_intrinsics.p)({});
-                (s.cupo_maximo);
+                (s.cupo_disponible);
                 // @ts-ignore
                 [];
                 // @ts-ignore

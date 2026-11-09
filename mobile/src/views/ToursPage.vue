@@ -78,6 +78,7 @@ async function cargar(reiniciar = false) {
     desdeCache.value = false
     await guardarCache('tours_p1', data.data)        // última lectura buena
   } catch (e) {
+    if ((e as any).response?.status === 401) return  // el interceptor cierra la sesión
     const guardado = await leerCache<Tour[]>('tours_p1')
     if (guardado) {                                    // sin red: mostrar la caché
       tours.value = guardado.datos
