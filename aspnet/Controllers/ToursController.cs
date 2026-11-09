@@ -1,4 +1,8 @@
+
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using aspnet.Data;
+using aspnet.Models;
 
 namespace aspnet.Controllers;
 
@@ -6,33 +10,93 @@ namespace aspnet.Controllers;
 [Route("api/tours")]
 public class ToursController : ControllerBase
 {
-    private static readonly List<Tour> tours = new()
-    {
-        new Tour { Id = 1, Nombre = "Volcán Arenal", Precio = 25000 },
-        new Tour { Id = 2, Nombre = "Monteverde", Precio = 30000 }
-    };
+    private readonly AppDbContext _context;
 
-    [HttpGet]
-    public IActionResult ObtenerTours()
+    public ToursController(AppDbContext context)
     {
+        _context = context;
+    }
+
+    // GET: /api/tours
+    // También permite aplicar filtros mediante parámetros.
+    [HttpGet]
+    public async Task<IActionResult> ObtenerTours(
+        [FromQuery(Name = "categoria_id")] int? categoriaId,
+        [FromQuery] string? estado,
+        [FromQuery(Name = "precio_min")] decimal? precioMin,
+        [FromQuery(Name = "precio_max")] decimal? precioMax,
+        [FromQuery(Name = "buscar")] string? buscar)
+    {
+        IQueryable<Tour> consulta = _context.Tours.AsNoTracking();
+
+        if (categoriaId.HasValue)
+            consulta = consulta.Where(t => t.CategoriaId == categoriaId.Value);
+
+        if (!string.IsNullOrWhiteSpace(estado))
+            consulta = consulta.Where(t => t.Estado == estado);
+
+        if (precioMin.HasValue)
+            consulta = consulta.Where(t => t.Precio >= precioMin.Value);
+
+        if (precioMax.HasValue)
+            consulta = consulta.Where(t => t.Precio <= precioMax.Value);
+
+        if (!string.IsNullOrWhiteSpace(buscar))
+            consulta = consulta.Where(t => t.Nombre.Contains(buscar));
+
+        var tours = await consulta
+            .OrderBy(t => t.Nombre)
+            .Select(t => new
+            {
+                id = t.Id,
+                categoria_id = t.CategoriaId,
+                nombre = t.Nombre,
+                descripcion = t.Descripcion,
+                precio = t.Precio,
+                duracion_horas = t.DuracionHoras,
+                estado = t.Estado,
+                categoria = t.Categoria == null ? null : new
+                {
+                    id = t.Categoria.Id,
+                    nombre = t.Categoria.Nombre
+                },
+                creado_en = t.CreatedAt,
+                actualizado_en = t.UpdatedAt
+            })
+            .ToListAsync();
+
         return Ok(tours);
     }
 
-    [HttpGet("{id}")]
-    public IActionResult ObtenerTour(int id)
+    // GET: /api/tours/1
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> ObtenerTour(int id)
     {
-        var tour = tours.FirstOrDefault(t => t.Id == id);
+        var tour = await _context.Tours
+            .AsNoTracking()
+            .Where(t => t.Id == id)
+            .Select(t => new
+            {
+                id = t.Id,
+                categoria_id = t.CategoriaId,
+                nombre = t.Nombre,
+                descripcion = t.Descripcion,
+                precio = t.Precio,
+                duracion_horas = t.DuracionHoras,
+                estado = t.Estado,
+                categoria = t.Categoria == null ? null : new
+                {
+                    id = t.Categoria.Id,
+                    nombre = t.Categoria.Nombre
+                },
+                creado_en = t.CreatedAt,
+                actualizado_en = t.UpdatedAt
+            })
+            .FirstOrDefaultAsync();
 
         if (tour == null)
-            return NotFound(new { mensaje = "Tour no encontrado" });
+            return NotFound(new { mensaje = "Tour no encontrado." });
 
         return Ok(tour);
     }
-}
-
-public class Tour
-{
-    public int Id { get; set; }
-    public string Nombre { get; set; } = "";
-    public decimal Precio { get; set; }
 }
