@@ -27,6 +27,8 @@ async function cargar(reiniciar = false) {
         await guardarCache('tours_p1', data.data); // última lectura buena
     }
     catch (e) {
+        if (e.response?.status === 401)
+            return; // el interceptor cierra la sesión
         const guardado = await leerCache('tours_p1');
         if (guardado) { // sin red: mostrar la caché
             tours.value = guardado.datos;
