@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      simular_fallo:
+        description: 'Forzar una prueba fallida (evidencia del lab)'
+        type: boolean
+        default: false
+
+jobs:
+  api:
+    name: API - pruebas
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite, mbstring
+      - run: composer install --no-interaction --prefer-dist
+      - run: cp .env.example .env && php artisan key:generate
+      - name: Pruebas
+        run: php artisan test
+        env:
+          SIMULAR_FALLO: ${{ inputs.simular_fallo && '1' || '0' }}
+
+  movil:
+    name: App móvil - compilación
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+      - run: npm run build
+        env:
+          VITE_API_URL: https://ejemplo.invalid/api
+
+  imagen:
+    name: Imagen - construir y publicar
+    needs: [api, movil]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Nombre de la imagen (en minúsculas)
+        run: echo "IMAGEN=ghcr.io/$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')-api" >> "$GITHUB_ENV"
+
+      - name: Construir imagen
+        run: docker build -t "$IMAGEN:${{ github.sha }}" backend
+
+      - name: Verificar que no corre como administrador
+        run: |
+          UID_CONTENEDOR=$(docker run --rm --entrypoint id "$IMAGEN:${{ github.sha }}" -u)
+          echo "uid del contenedor: $UID_CONTENEDOR"
+          test "$UID_CONTENEDOR" != "0"
+
+      - name: Tamaño de la imagen
+        run: |
+          echo "### Imagen del back-end" >> "$GITHUB_STEP_SUMMARY"
+          docker images "$IMAGEN" --format '- {{.Repository}}:{{.Tag}} — {{.Size}}' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publicar en ghcr.io
+        run: |
+          docker tag "$IMAGEN:${{ github.sha }}" "$IMAGEN:latest"
+          docker push "$IMAGEN:${{ github.sha }}"
+          docker push "$IMAGEN:latest"
+          

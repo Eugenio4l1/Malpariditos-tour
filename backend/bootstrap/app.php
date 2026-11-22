@@ -24,6 +24,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+             // Azure termina el HTTPS antes del contenedor: confiar en el proxy
+        // para que Laravel genere URLs con https:// y no http://.
+        $middleware->trustProxies(at: '*');
         // JSON malformado -> 400 antes de llegar a la validación (que daría 422)
         $middleware->api(prepend: [RejectMalformedJson::class]);
 
