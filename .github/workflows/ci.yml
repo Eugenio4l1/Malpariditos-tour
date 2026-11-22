@@ -25,11 +25,14 @@ jobs:
           php-version: '8.4'
           extensions: pdo_sqlite, mbstring
       - run: composer install --no-interaction --prefer-dist
+      - run: composer install --no-interaction --prefer-dist
+      - run: cp .env.example .env && php artisan key:generate
       - run: cp .env.example .env && php artisan key:generate
       - name: Pruebas
         run: php artisan test
         env:
           SIMULAR_FALLO: ${{ inputs.simular_fallo && '1' || '0' }}
+          
 
   movil:
     name: App móvil - compilación
@@ -88,4 +91,3 @@ jobs:
           docker tag "$IMAGEN:${{ github.sha }}" "$IMAGEN:latest"
           docker push "$IMAGEN:${{ github.sha }}"
           docker push "$IMAGEN:latest"
-          
