@@ -3,8 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use App\Models\Tour;
 
+// Raíz de la API: respuesta ligera. La vista "welcome" usa @vite y fallaría
+// en producción porque la imagen no incluye los recursos compilados.
 Route::get('/', function () {
-    return view('welcome');
+    return response()->json([
+        'servicio' => 'Malpariditos Tour API',
+        'estado' => 'activo',
+    ]);
 });
 
 Route::get('/tours-activos', function () {
@@ -16,4 +21,3 @@ Route::get('/tours-por-categoria', function () {
         ->groupBy('categoria_id')
         ->get();
 });
-

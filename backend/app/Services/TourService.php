@@ -43,7 +43,7 @@ class TourService
         }
 
         if (!empty($filters['buscar'])) {
-            $query->where('nombre', 'like', '%' . $filters['buscar'] . '%');
+          $query->whereLike('nombre', '%' . $filters['buscar'] . '%');
         }
 
         return $query->orderBy($sortBy, $sortDir)->paginate($perPage);
