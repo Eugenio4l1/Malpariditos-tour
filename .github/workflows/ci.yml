@@ -24,14 +24,13 @@ jobs:
         with:
           php-version: '8.4'
           extensions: pdo_sqlite, mbstring
-      -      - run: cp .env.example .env
+      - run: cp .env.example .env
       - run: composer install --no-interaction --prefer-dist
       - run: php artisan key:generate
       - name: Pruebas
         run: php artisan test
         env:
           SIMULAR_FALLO: ${{ inputs.simular_fallo && '1' || '0' }}
-          
 
   movil:
     name: App móvil - compilación
