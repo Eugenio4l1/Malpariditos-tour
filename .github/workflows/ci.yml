@@ -89,3 +89,19 @@ jobs:
           docker tag "$IMAGEN:${{ github.sha }}" "$IMAGEN:latest"
           docker push "$IMAGEN:${{ github.sha }}"
           docker push "$IMAGEN:latest"
+            desplegar:
+    name: Desplegar en Render
+    needs: [imagen]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar despliegue
+        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+
+      - name: Verificar estado
+        run: |
+          for i in $(seq 1 20); do
+            curl -fsS https://malpariditos-tour.onrender.com/up && exit 0
+            sleep 15
+          done
+          exit 1
