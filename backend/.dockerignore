@@ -12,3 +12,5 @@ database/*.sqlite
 .phpunit.result.cache
 .phpunit.cache
 public/hot
+Select-String -Path backend\bootstrap\app.php -Pattern trustProxies
+bootstrap/cache/*.php
