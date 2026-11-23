@@ -5,8 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Malpariditos Tour',
   webDir: 'dist',
   server: {
-    androidScheme: 'http',   // origen http://localhost (lo permite CORS en Laravel)
-    cleartext: true,         // API en http:// durante el desarrollo
+    androidScheme: 'https',   // origen https://localhost (debe estar en CORS_ALLOWED_ORIGINS)
   },
 }
 
