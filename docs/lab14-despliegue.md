@@ -1,8 +1,6 @@
 # Laboratorio 14 — Despliegue del proyecto en un entorno operativo
 
 **Proyecto:** Malpariditos Tour  
-**Integrantes:** _(completar con los nombres del equipo)_  
-**Fecha de entrega:** domingo 22 de noviembre de 2026
 
 ---
 
