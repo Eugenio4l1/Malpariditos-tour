@@ -11,6 +11,8 @@ if (authActions) {
   if (loginLink) {
     loginLink.href = "login.html";
     loginLink.textContent = authSession ? "Sesión activa" : "Ingresar";
+      const registerLink = authActions.querySelector('a[href="register.html"]');
+  if (registerLink && authSession) registerLink.remove();
   }
 
   if (hasAdminAccess()) {

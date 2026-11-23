@@ -1,5 +1,5 @@
-/// <reference types="C:/Users/Wadih/Desktop/ProyectoMalparidosTour/mobile/node_modules/@vue/language-core/types/template-helpers.d.ts" />
-/// <reference types="C:/Users/Wadih/Desktop/ProyectoMalparidosTour/mobile/node_modules/@vue/language-core/types/props-fallback.d.ts" />
+/// <reference types="C:/Users/A.R/Desktop/Malpariditos-tour/mobile/node_modules/@vue/language-core/types/template-helpers.d.ts" />
+/// <reference types="C:/Users/A.R/Desktop/Malpariditos-tour/mobile/node_modules/@vue/language-core/types/props-fallback.d.ts" />
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { http, mensajeError } from '../services/http';

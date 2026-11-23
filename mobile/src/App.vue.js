@@ -1,5 +1,5 @@
-/// <reference types="C:/Users/Wadih/Desktop/ProyectoMalparidosTour/mobile/node_modules/@vue/language-core/types/template-helpers.d.ts" />
-/// <reference types="C:/Users/Wadih/Desktop/ProyectoMalparidosTour/mobile/node_modules/@vue/language-core/types/props-fallback.d.ts" />
+/// <reference types="C:/Users/A.R/Desktop/Malpariditos-tour/mobile/node_modules/@vue/language-core/types/template-helpers.d.ts" />
+/// <reference types="C:/Users/A.R/Desktop/Malpariditos-tour/mobile/node_modules/@vue/language-core/types/props-fallback.d.ts" />
 const __VLS_ctx = {};
 let __VLS_components;
 let __VLS_intrinsics;
