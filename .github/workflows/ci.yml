@@ -89,7 +89,8 @@ jobs:
           docker tag "$IMAGEN:${{ github.sha }}" "$IMAGEN:latest"
           docker push "$IMAGEN:${{ github.sha }}"
           docker push "$IMAGEN:latest"
-            desplegar:
+
+  desplegar:
     name: Desplegar en Render
     needs: [imagen]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
