@@ -15,8 +15,9 @@ export class ApiError extends Error {
   get isCancelled() { return this.kind === "cancelled"; }
   get isConnectionError() { return this.kind === "connection"; }
 }
-
-const DEFAULT_API_URL = "http://localhost:8000/api";
+const DEFAULT_API_URL = ["localhost", "127.0.0.1"].includes(globalThis.location?.hostname)
+  ? "http://localhost:8000/api"
+  : "https://malpariditos-tour.onrender.com/api";
 
 function normalizeBaseUrl(baseUrl) {
   return String(baseUrl || DEFAULT_API_URL).replace(/\/+$/, "");
