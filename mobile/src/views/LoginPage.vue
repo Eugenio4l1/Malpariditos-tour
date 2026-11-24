@@ -1,6 +1,8 @@
 <template>
   <ion-page>
     <ion-header><ion-toolbar color="primary"><ion-title>Malpariditos Tour</ion-title></ion-toolbar></ion-header>
+          <p class="ion-text-center ion-margin-top">¿Aún no tienes cuenta?</p>
+      <ion-button expand="block" fill="outline" type="button" @click="router.push('/register')">Crear cuenta</ion-button>
     <ion-content class="ion-padding">
       <form @submit.prevent="entrar">
         <ion-input v-model="email" type="email" label="Correo" label-placement="floating" fill="outline" autocomplete="email" class="ion-margin-bottom" />

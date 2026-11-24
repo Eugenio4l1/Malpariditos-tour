@@ -23,6 +23,13 @@ export const useAuth = defineStore('auth', {
             setToken(this.token);
             await guardarSesion(this.token, this.usuario);
         },
+        async registrar(name, email, password, password_confirmation) {
+            const { data } = await http.post('register', { name, email, password, password_confirmation }, { timeout: 60000 });
+            this.token = data.data.token;
+            this.usuario = data.data.usuario;
+            setToken(this.token);
+            await guardarSesion(this.token, this.usuario);
+        },
         async logout() {
             try {
                 await http.post('logout');

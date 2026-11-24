@@ -4,6 +4,7 @@ import { useAuth } from '../stores/auth';
 const routes = [
     { path: '/', redirect: '/tours' },
     { path: '/login', component: () => import('../views/LoginPage.vue') },
+    { path: '/register', component: () => import('../views/RegisterPage.vue') },
     { path: '/tours', component: () => import('../views/ToursPage.vue'), meta: { requiresAuth: true } },
     { path: '/tours/:id', component: () => import('../views/TourDetallePage.vue'), meta: { requiresAuth: true } },
     { path: '/tours/:id/reservar/:salidaId', component: () => import('../views/ReservaFormPage.vue'), meta: { requiresAuth: true } },
@@ -13,7 +14,7 @@ router.beforeEach((to) => {
     const auth = useAuth();
     if (to.meta.requiresAuth && !auth.autenticado)
         return { path: '/login', replace: true };
-    if (to.path === '/login' && auth.autenticado)
+    if (['/login', '/register'].includes(to.path) && auth.autenticado)
         return { path: '/tours', replace: true };
 });
 export default router;
