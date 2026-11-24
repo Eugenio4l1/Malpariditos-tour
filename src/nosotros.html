@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nosotros | Malpariditos Tours</title>
+  <meta name="description" content="Quiénes somos: tours urbanos y rurales con guías locales en Costa Rica.">
+
+  <script>document.documentElement.classList.add("js");</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap">
+
+  <link rel="stylesheet" href="css/global.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+
+      <a class="brand" href="index.html">
+        <img class="brand__logo" src="img/logo.jpg" alt="" width="36" height="36">
+        <span>Malpariditos Tours</span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+        <span class="visually-hidden">Menú</span>
+      </button>
+
+      <nav class="site-nav" id="menu-principal" aria-label="Principal">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="catalogo.html">Paquetes</a></li>
+          <li><a class="site-nav__link" href="destinos.html">Destinos</a></li>
+          <li><a class="site-nav__link" href="guias.html">Guías</a></li>
+          <li><a class="site-nav__link" href="eventos.html">Eventos</a></li>
+          <li><a class="site-nav__link" href="nosotros.html" aria-current="page">Nosotros</a></li>
+        </ul>
+        <div class="site-nav__actions">
+          <a class="btn btn--secondary" href="login.html">Ingresar</a>
+          <a class="btn btn--primary" href="register.html">Registrarse</a>
+        </div>
+      </nav>
+
+    </div>
+  </header>
+
+  <main id="contenido" tabindex="-1">
+    <div class="container section">
+
+      <nav aria-label="Ruta de navegación">
+        <ol class="breadcrumb">
+          <li><a href="index.html">Inicio</a></li>
+          <li aria-current="page">Nosotros</li>
+        </ol>
+      </nav>
+
+      <h1 class="section-head">Nosotros</h1>
+
+      <section aria-labelledby="titulo-quienes">
+        <h2 id="titulo-quienes">Quiénes somos</h2>
+        <p>Malpariditos Tours ofrece tours urbanos y rurales en Costa Rica, siempre acompañados por guías locales.</p>
+      </section>
+
+      <section aria-labelledby="titulo-ofrecemos">
+        <h2 id="titulo-ofrecemos">Qué ofrecemos</h2>
+        <ul>
+          <li><strong>Turismo urbano:</strong> museos, gastronomía y cultura.</li>
+          <li><strong>Turismo rural:</strong> naturaleza, fincas y comunidades.</li>
+          <li><strong>Guías locales</strong> en cada recorrido.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="titulo-reservar">
+        <h2 id="titulo-reservar">Cómo reservar</h2>
+        <ol>
+          <li>Elija un paquete en el catálogo.</li>
+          <li>Escoja la fecha y el número de personas.</li>
+          <li>Inicie sesión o cree su cuenta para confirmar.</li>
+        </ol>
+      </section>
+
+      <p>
+        <a class="btn btn--primary" href="catalogo.html">Ver paquetes</a>
+        <a class="btn btn--secondary" href="register.html">Crear cuenta</a>
+      </p>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p class="site-footer__brand">Malpariditos Tours</p>
+      <nav aria-label="Pie de página">
+        <ul class="site-footer__list">
+          <li><a href="#">Contacto</a></li>
+          <li><a href="#">Redes</a></li>
+          <li><a href="#">Términos</a></li>
+          <li><a href="#">Privacidad</a></li>
+          <li><a href="#">Accesibilidad</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module" src="modules/main.js"></script>
+</body>
+</html>
