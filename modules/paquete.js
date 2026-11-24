@@ -1,5 +1,77 @@
 /* Pantalla de detalle: galería, pestañas, hoja de reserva (móvil) y formulario de reserva. */
+import { apiClient, ApiError } from "./api/ApiClient.js";
 
+/* ---------- Cargar el paquete elegido (paquete.html?tour=ID) ---------- */
+const formatoPrecio = new Intl.NumberFormat("es-CR", { maximumFractionDigits: 0 });
+const colones = (n) => `₡${formatoPrecio.format(Number(n) || 0)}`;
+
+function mostrarErrorPaquete(mensaje) {
+  const detalle = document.querySelector(".detail");
+  if (detalle) {
+    detalle.innerHTML = `<div role="alert"><h1>${mensaje}</h1><p><a class="btn btn--primary" href="catalogo.html">Volver al catálogo</a></p></div>`;
+  }
+  document.querySelector(".booking-bar")?.remove();
+  document.body.classList.remove("has-booking-bar");
+}
+
+async function cargarPaquete() {
+  const id = new URLSearchParams(location.search).get("tour");
+  if (!id) return; // sin ?tour= se deja la página de ejemplo tal cual
+
+  let tour;
+  try {
+    const payload = await apiClient.get(`tours/${encodeURIComponent(id)}`);
+    tour = payload.data;
+  } catch (error) {
+    mostrarErrorPaquete(
+      error instanceof ApiError && error.status === 404
+        ? "Este paquete no existe."
+        : "No se pudo cargar el paquete. Intenta nuevamente.",
+    );
+    return;
+  }
+
+  const nombre = tour.nombre || "Tour sin nombre";
+  const descripcion = tour.descripcion || "Experiencia turística en Costa Rica.";
+  const precio = Number(tour.precio) || 0;
+
+  document.title = `${nombre} | Malpariditos Tours`;
+  document.querySelector('meta[name="description"]')?.setAttribute("content", descripcion);
+  const migaActual = document.querySelector(".breadcrumb [aria-current='page']");
+  if (migaActual) migaActual.textContent = nombre;
+  const titulo = document.querySelector(".summary h1");
+  if (titulo) titulo.textContent = nombre;
+
+  const etiquetas = document.querySelector(".tags");
+  if (etiquetas) {
+    etiquetas.replaceChildren(
+      ...[tour.categoria?.nombre || "Tour", `${tour.duracion_horas} horas`, tour.estado].map((texto) => {
+        const li = document.createElement("li");
+        li.className = "tag";
+        li.textContent = texto;
+        return li;
+      }),
+    );
+  }
+
+  const panel = document.getElementById("tab-descripcion");
+  if (panel) {
+    panel.querySelectorAll("p").forEach((p) => p.remove());
+    const parrafo = document.createElement("p");
+    parrafo.textContent = descripcion;
+    panel.append(parrafo);
+  }
+
+  const monto = document.querySelector(".booking__amount");
+  if (monto) monto.textContent = colones(precio);
+  const montoBarra = document.querySelector(".booking-bar__price strong");
+  if (montoBarra) montoBarra.textContent = colones(precio);
+  const formulario = document.getElementById("form-reserva");
+  if (formulario) formulario.dataset.price = String(precio);
+}
+
+// Se espera a tener los datos para que galería, pestañas y formulario arranquen ya con el paquete correcto.
+await cargarPaquete();
 const desktop = window.matchMedia("(min-width: 64em)");
 
 /* ---------- Galería ---------- */
@@ -148,7 +220,7 @@ if (form) {
   const price = Number(form.dataset.price);
   const taxRate = Number(form.dataset.tax);
   const status = form.querySelector(".booking__status");
-  const money = (n) => `$${n.toLocaleString("en-US")}`;
+   const money = colones;
 
   const today = new Date();
   const pad = (n) => String(n).padStart(2, "0");
