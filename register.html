@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrarse | Malpariditos Tours</title>
+  <script>document.documentElement.classList.add("js");</script>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="index.html"><img class="brand__logo" src="img/logo.jpg" alt="" width="36" height="36"><span>Malpariditos Tours</span></a>
+      <nav class="site-nav site-nav--static" aria-label="Principal">
+        <div class="site-nav__actions"><a class="btn btn--secondary" href="catalogo.html">Volver al catálogo</a></div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido" class="container form-page" tabindex="-1">
+    <section class="form-card" aria-labelledby="titulo-registro">
+      <h1 id="titulo-registro">Crear cuenta</h1>
+      <p class="text-muted">Regístrate para reservar tus tours.</p>
+      <p class="form-status" data-register-status role="status" hidden></p>
+      <form id="register-form" novalidate>
+        <div class="field">
+          <label class="field__label" for="register-name">Nombre completo</label>
+          <input class="field__control" id="register-name" name="name" type="text" autocomplete="name" minlength="2" maxlength="255" required>
+          <p class="field__error" data-error-for="name" hidden></p>
+        </div>
+        <div class="field">
+          <label class="field__label" for="register-email">Correo electrónico</label>
+          <input class="field__control" id="register-email" name="email" type="email" autocomplete="email" required>
+          <p class="field__error" data-error-for="email" hidden></p>
+        </div>
+        <div class="field">
+          <label class="field__label" for="register-password">Contraseña</label>
+          <input class="field__control" id="register-password" name="password" type="password" autocomplete="new-password" aria-describedby="register-password-hint" required>
+          <p class="field__hint" id="register-password-hint">Mínimo 8 caracteres, con mayúsculas, minúsculas, un número y un símbolo.</p>
+          <p class="field__error" data-error-for="password" hidden></p>
+        </div>
+        <div class="field">
+          <label class="field__label" for="register-password-confirmation">Confirmar contraseña</label>
+          <input class="field__control" id="register-password-confirmation" name="password_confirmation" type="password" autocomplete="new-password" required>
+          <p class="field__error" data-error-for="password_confirmation" hidden></p>
+        </div>
+        <button class="btn btn--primary btn--block" type="submit" data-register-submit>Crear cuenta</button>
+      </form>
+      <p class="text-muted">¿Ya tienes cuenta? <a href="login.html">Ingresar</a></p>
+    </section>
+  </main>
+  <script type="module" src="modules/register.js"></script>
+</body>
+</html>
