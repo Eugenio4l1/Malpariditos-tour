@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Destinos | Malpariditos Tours</title>
+  <meta name="description" content="Destinos de Malpariditos Tours en Costa Rica.">
+
+  <script>document.documentElement.classList.add("js");</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap">
+
+  <link rel="stylesheet" href="css/global.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+
+      <a class="brand" href="index.html">
+        <img class="brand__logo" src="img/logo.jpg" alt="" width="36" height="36">
+        <span>Malpariditos Tours</span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+        <span class="visually-hidden">Menú</span>
+      </button>
+
+      <nav class="site-nav" id="menu-principal" aria-label="Principal">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="catalogo.html">Paquetes</a></li>
+          <li><a class="site-nav__link" href="destinos.html" aria-current="page">Destinos</a></li>
+          <li><a class="site-nav__link" href="guias.html">Guías</a></li>
+          <li><a class="site-nav__link" href="eventos.html">Eventos</a></li>
+          <li><a class="site-nav__link" href="nosotros.html">Nosotros</a></li>
+        </ul>
+        <div class="site-nav__actions">
+          <a class="btn btn--secondary" href="login.html">Ingresar</a>
+          <a class="btn btn--primary" href="register.html">Registrarse</a>
+        </div>
+      </nav>
+
+    </div>
+  </header>
+
+  <main id="contenido" tabindex="-1">
+    <div class="container section">
+
+      <nav aria-label="Ruta de navegación">
+        <ol class="breadcrumb">
+          <li><a href="index.html">Inicio</a></li>
+          <li aria-current="page">Destinos</li>
+        </ol>
+      </nav>
+
+      <h1 class="section-head">Destinos</h1>
+      <p class="text-muted">Elija un destino y vea los paquetes disponibles.</p>
+
+      <ul class="card-grid card-grid--wide">
+        <li>
+          <article class="card">
+            <div class="card__media">
+              <img class="card__img" src="https://images.pexels.com/photos/9069745/pexels-photo-9069745.jpeg" alt="Volcán y aguas termales de La Fortuna" width="800" height="600" loading="lazy">
+              <span class="badge">Rural</span>
+            </div>
+            <div class="card__body">
+              <h3>La Fortuna y el volcán Arenal</h3>
+              <p class="card__place"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg> La Fortuna</p>
+              <p class="text-small text-muted">Volcán, senderos y aguas termales para un viaje de naturaleza y descanso.</p>
+              <div class="card__footer">
+                <a class="btn btn--primary" href="catalogo.html?buscar=Volc%C3%A1n">Ver paquetes<span class="visually-hidden"> en La Fortuna</span></a>
+              </div>
+            </div>
+          </article>
+        </li>
+
+        <li>
+          <article class="card">
+            <div class="card__media">
+              <img class="card__img" src="https://images.pexels.com/photos/34204821/pexels-photo-34204821.jpeg" alt="Café, montaña y mariposas en Monteverde" width="800" height="600" loading="lazy">
+              <span class="badge">Rural</span>
+            </div>
+            <div class="card__body">
+              <h3>Monteverde y el bosque nuboso</h3>
+              <p class="card__place"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg> Monteverde</p>
+              <p class="text-small text-muted">Café, montaña y mariposas entre la neblina del bosque nuboso.</p>
+              <div class="card__footer">
+                <a class="btn btn--primary" href="catalogo.html?buscar=Bosque%20Nuboso">Ver paquetes<span class="visually-hidden"> en Monteverde</span></a>
+              </div>
+            </div>
+          </article>
+        </li>
+
+        <li>
+          <article class="card">
+            <div class="card__media">
+              <img class="card__img" src="https://images.pexels.com/photos/39402239/pexels-photo-39402239.jpeg" alt="Tour histórico por el centro de San José" width="800" height="600" loading="lazy">
+              <span class="badge">Urbano</span>
+            </div>
+            <div class="card__body">
+              <h3>San José histórico</h3>
+              <p class="card__place"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0a5 5 0 0 0-5 5c0 3.5 5 11 5 11s5-7.5 5-11a5 5 0 0 0-5-5zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg> San José</p>
+              <p class="text-small text-muted">Museos, gastronomía y cultura en el corazón de la capital.</p>
+              <div class="card__footer">
+                <a class="btn btn--primary" href="catalogo.html?buscar=Hist%C3%B3rico">Ver paquetes<span class="visually-hidden"> en San José</span></a>
+              </div>
+            </div>
+          </article>
+        </li>
+      </ul>
+
+      <p><a class="link-more" href="catalogo.html">Ver todos los paquetes</a></p>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p class="site-footer__brand">Malpariditos Tours</p>
+      <nav aria-label="Pie de página">
+        <ul class="site-footer__list">
+          <li><a href="#">Contacto</a></li>
+          <li><a href="#">Redes</a></li>
+          <li><a href="#">Términos</a></li>
+          <li><a href="#">Privacidad</a></li>
+          <li><a href="#">Accesibilidad</a></li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module" src="modules/main.js"></script>
+</body>
+</html>
