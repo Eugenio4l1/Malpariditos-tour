@@ -1,7 +1,7 @@
 /* Pantalla de detalle: galería, pestañas, hoja de reserva (móvil) y formulario de reserva. */
 import { apiClient, ApiError } from "./api/ApiClient.js";
 import { aplicarExtras } from "./extras.js";
-
+import { addItem } from "./cart.js";
 /* ---------- Cargar el paquete elegido (paquete.html?tour=ID) ---------- */
 const formatoPrecio = new Intl.NumberFormat("es-CR", { maximumFractionDigits: 0 });
 const colones = (n) => `₡${formatoPrecio.format(Number(n) || 0)}`;
@@ -303,7 +303,19 @@ if (form) {
 
   form.addEventListener("submit", (ev) => {
     ev.preventDefault();
-    status.textContent = "Todo listo. Para confirmar la reserva se le pedirá ingresar o crear su usuario.";
+    addItem({
+      tourId: new URLSearchParams(location.search).get("tour") || "ejemplo",
+      nombre: document.querySelector(".summary h1")?.textContent.trim() || document.title,
+      precio: price,
+      fecha: date.value,
+      personas: people.valueAsNumber,
+      imagen: document.querySelector("[data-gallery-main]")?.src || "",
+    });
+    status.textContent = "Agregado al carrito. ";
+    const enlace = document.createElement("a");
+    enlace.href = "carrito.html";
+    enlace.textContent = "Ver carrito";
+    status.append(enlace);
     status.hidden = false;
   });
 

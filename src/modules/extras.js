@@ -138,7 +138,7 @@ const PLANTILLAS = {
       ["Cierre dulce", "Postre y despedida."],
     ],
     incluye: ["Guía local", "Degustaciones en cada parada", "Bebidas", "Mapa de la ruta"],
-    guia: { ...GUIAS.sarita, detalle: "Español, English · Gastronomía local, Catadora de chismes" },
+    guia: { ...GUIAS.sarita, detalle: "Español, English · Gastronomía local, Catadora de hombres" },
     encuentro: { texto: "Parque Central, San José" },
     llevar: "Calzado cómodo para caminar, ganas de probar de todo y aviso previo de alergias o dietas.",
   },
