@@ -1,20 +1,33 @@
-/* Datos propios de cada paquete: fotos, itinerario, qué incluye, guía y punto de encuentro.
- *
- * La llave de EXTRAS es el id del tour (el número de la URL: paquete.html?tour=3).
- * Todo es opcional: lo que no pongas se queda como está en paquete.html.
- *
- * FOTOS: guarda tus imágenes en src/img/ con los nombres que se indican abajo
- * (por ejemplo img/tirolesa-1.jpg ... img/tirolesa-4.jpg) y cambia
- * USAR_FOTOS_PROPIAS a true. Mientras esté en false se ven las fotos de paquete.html.
- */
+
 const USAR_FOTOS_PROPIAS = false;
 
 const fotos = (slug, ...alts) =>
   USAR_FOTOS_PROPIAS
     ? alts.map((alt, i) => ({ src: `img/${slug}-${i + 1}.jpg`, alt }))
     : undefined;
-
-const TIMMY = "https://media.tenor.com/cmnOLYxGICYAAAAe/timmy-mcdoodle.png";
+ 
+const GUIAS = {
+  derek: {
+    nombre: "Derek",
+    foto: "https://i.pinimg.com/736x/0a/2f/4a/0a2f4ae218291666b00b84a7e098d3c3.jpg",
+  },
+  yogurt: {
+    nombre: "Yogurt",
+    foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrLS9QPUnfBjcKGAtY-kYBD6ntlZb9d0MY3vMAIKrH-w&s=10",
+  },
+  aaron: {
+    nombre: "Aaron",
+    foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqvBI-dBRltUOBo8jFF47hRcejt3lXX4hTYfvksMTdeg&s=10",
+  },
+  sarita: {
+    nombre: "Sarita",
+    foto: "https://cdn.tomodachiplaza.app/miis/3119/mii.webp?v=1777357081",
+  },
+  eugin: {
+    nombre: "Eugin",
+    foto: "https://images-ext-1.discordapp.net/external/_0t9fUhq5ERlMy8DzFbGW9n6wEsNK283WaKtOqNhP_w/%3Fr%3D0%26rs%3D1%26pid%3DImgDetMain%26o%3D7%26rm%3D3/https/tse4.mm.bing.net/th/id/OIP.JB0hhaQXyEHfmxfTqaaFAwHaJN?format=webp",
+  },
+};
 
 /* ---------- Una plantilla por actividad ---------- */
 const PLANTILLAS = {
@@ -27,7 +40,7 @@ const PLANTILLAS = {
       ["Caminata y regreso", "Paseo corto por el bosque y retorno al punto de salida."],
     ],
     incluye: ["Guía certificado", "Arnés, casco y guantes", "Seguro de actividad", "Fotos del grupo"],
-    guia: { nombre: "Timmy", foto: TIMMY, detalle: "Español, English · Seguridad en alturas" },
+    guia: { ...GUIAS.derek, detalle: "Español, English · Seguridad en alturas" },
     encuentro: { texto: "Parque Central de Santa Elena, Monteverde" },
     llevar: "Ropa cómoda, calzado cerrado, chaqueta ligera por la neblina y cámara con correa.",
   },
@@ -41,7 +54,7 @@ const PLANTILLAS = {
       ["Refrigerio y regreso", "Descanso, algo de comer y transporte de vuelta."],
     ],
     incluye: ["Guía de río certificado", "Chaleco, casco y remo", "Transporte al punto de salida", "Refrigerio"],
-    guia: { nombre: "Timmy", foto: TIMMY, detalle: "Español, English · Rescate en aguas rápidas" },
+    guia: { ...GUIAS.yogurt, detalle: "Español, English · Rescate en aguas rápidas" },
     encuentro: { texto: "Plaza de Puerto Viejo de Sarapiquí" },
     llevar: "Traje de baño, sandalias sujetas al pie, ropa de cambio, bloqueador y toalla.",
   },
@@ -55,7 +68,7 @@ const PLANTILLAS = {
       ["Regreso", "Descenso por la misma ruta y transporte de vuelta."],
     ],
     incluye: ["Guía local bilingüe", "Transporte durante el tour", "Agua y snack", "Entrada al parque"],
-    guia: { nombre: "Timmy", foto: TIMMY, detalle: "Español, English · Senderismo de montaña" },
+    guia: { ...GUIAS.aaron, detalle: "Español, English · Senderismo de montaña" },
     encuentro: { texto: "Parque Central de La Fortuna" },
     llevar: "Calzado de caminata, ropa cómoda, impermeable, gorra, bloqueador y agua.",
   },
@@ -69,7 +82,7 @@ const PLANTILLAS = {
       ["Desayuno y regreso", "Desayuno típico y cierre de la jornada."],
     ],
     incluye: ["Guía especializado en aves", "Binoculares compartidos", "Café y desayuno", "Lista de especies vistas"],
-    guia: { nombre: "Timmy", foto: TIMMY, detalle: "Español, English · Observación de aves" },
+    guia: { ...GUIAS.sarita, detalle: "Español, English · Observación de aves" },
     encuentro: { texto: "Entrada principal de la reserva (se confirma al reservar)" },
     llevar: "Ropa de colores neutros, calzado cerrado, repelente, gorra y binoculares propios si tiene.",
   },
@@ -83,7 +96,7 @@ const PLANTILLAS = {
       ["Regreso", "Retorno al punto de salida."],
     ],
     incluye: ["Guía local", "Transporte durante el tour", "Agua", "Seguro de actividad"],
-    guia: { nombre: "Timmy", foto: TIMMY, detalle: "Español, English · Rutas de naturaleza" },
+    guia: { ...GUIAS.eugin, detalle: "Español, English · Rutas de naturaleza" },
     encuentro: { texto: "Entrada del sendero (se confirma al reservar)" },
     llevar: "Traje de baño, calzado antideslizante, ropa de cambio, toalla y bolsa para cosas mojadas.",
   },
@@ -97,7 +110,7 @@ const PLANTILLAS = {
       ["Regreso al muelle", "Retorno y cierre de la actividad."],
     ],
     incluye: ["Guía naturalista", "Kayak, remo y chaleco", "Agua", "Seguro de actividad"],
-    guia: { nombre: "Timmy", foto: TIMMY, detalle: "Español, English · Kayak y manglares" },
+    guia: { ...GUIAS.derek, detalle: "Español, English · Kayak y manglares" },
     encuentro: { texto: "Muelle principal (se confirma al reservar)" },
     llevar: "Ropa que se pueda mojar, sandalias sujetas, bloqueador, repelente, gorra y cámara resistente al agua.",
   },
@@ -111,7 +124,7 @@ const PLANTILLAS = {
       ["Almuerzo y playa", "Tiempo libre en la playa y regreso en lancha."],
     ],
     incluye: ["Guía de snorkel", "Transporte en lancha", "Máscara, tubo y chaleco", "Almuerzo"],
-    guia: { nombre: "Timmy", foto: TIMMY, detalle: "Español, English · Buceo y snorkel" },
+    guia: { ...GUIAS.yogurt, detalle: "Español, English · Buceo y snorkel" },
     encuentro: { texto: "Muelle de Puntarenas" },
     llevar: "Traje de baño, toalla, bloqueador biodegradable, sombrero y ropa de cambio.",
   },
@@ -125,7 +138,7 @@ const PLANTILLAS = {
       ["Cierre dulce", "Postre y despedida."],
     ],
     incluye: ["Guía local", "Degustaciones en cada parada", "Bebidas", "Mapa de la ruta"],
-    guia: { nombre: "Timmy", foto: TIMMY, detalle: "Español, English · Gastronomía local" },
+    guia: { ...GUIAS.sarita, detalle: "Español, English · Gastronomía local" },
     encuentro: { texto: "Parque Central, San José" },
     llevar: "Calzado cómodo para caminar, ganas de probar de todo y aviso previo de alergias o dietas.",
   },
@@ -139,7 +152,7 @@ const PLANTILLAS = {
       ["Regreso", "Retorno al punto de salida."],
     ],
     incluye: ["Guía naturalista", "Linterna", "Agua", "Seguro de actividad"],
-    guia: { nombre: "Timmy", foto: TIMMY, detalle: "Español, English · Fauna nocturna" },
+    guia: { ...GUIAS.aaron, detalle: "Español, English · Fauna nocturna" },
     encuentro: { texto: "Entrada del refugio (se confirma al reservar)" },
     llevar: "Calzado cerrado, pantalón largo, repelente, chaqueta ligera y linterna de repuesto.",
   },
@@ -153,7 +166,7 @@ const PLANTILLAS = {
       ["Pausa y regreso", "Descanso con vista al mar y vuelta al punto de partida."],
     ],
     incluye: ["Guía a caballo", "Caballo y equipo de montar", "Casco", "Agua"],
-    guia: { nombre: "Timmy", foto: TIMMY, detalle: "Español, English · Cabalgatas" },
+    guia: { ...GUIAS.eugin, detalle: "Español, English · Cabalgatas" },
     encuentro: { texto: "Entrada de la playa (se confirma al reservar)" },
     llevar: "Pantalón largo, calzado cerrado, bloqueador, sombrero y ropa de cambio.",
   },
@@ -167,7 +180,7 @@ const PLANTILLAS = {
       ["Cierre", "Pausa para café y despedida."],
     ],
     incluye: ["Guía historiador local", "Transporte durante el tour", "Entradas a los sitios del recorrido", "Mapa histórico"],
-    guia: { nombre: "Timmy", foto: TIMMY, detalle: "Español, English · Historia y patrimonio" },
+    guia: { ...GUIAS.derek, detalle: "Español, English · Historia y patrimonio" },
     encuentro: { texto: "Teatro Nacional, San José" },
     llevar: "Calzado cómodo, ropa fresca, gorra, bloqueador y agua.",
   },
