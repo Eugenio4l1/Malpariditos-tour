@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-header><ion-toolbar color="primary"><ion-title>Malpariditos Tour</ion-title></ion-toolbar></ion-header>
-          <p class="ion-text-center ion-margin-top">¿Aún no tienes cuenta?</p>
+         <p class="ion-text-center ion-margin-top">¿Aún no tienes cuenta?</p>
       <ion-button expand="block" fill="outline" type="button" @click="router.push('/register')">Crear cuenta</ion-button>
     <ion-content class="ion-padding">
       <form @submit.prevent="entrar">
@@ -11,6 +11,7 @@
         <ion-button expand="block" type="submit" class="ion-margin-top" :disabled="cargando || !email || !password">
           <ion-spinner v-if="cargando" name="dots" />
           <span v-else>Iniciar sesión</span>
+         
         </ion-button>
       </form>
     </ion-content>
