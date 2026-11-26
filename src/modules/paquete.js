@@ -1,5 +1,6 @@
 /* Pantalla de detalle: galería, pestañas, hoja de reserva (móvil) y formulario de reserva. */
 import { apiClient, ApiError } from "./api/ApiClient.js";
+import { aplicarExtras } from "./extras.js";
 
 /* ---------- Cargar el paquete elegido (paquete.html?tour=ID) ---------- */
 const formatoPrecio = new Intl.NumberFormat("es-CR", { maximumFractionDigits: 0 });
@@ -68,6 +69,8 @@ async function cargarPaquete() {
   if (montoBarra) montoBarra.textContent = colones(precio);
   const formulario = document.getElementById("form-reserva");
   if (formulario) formulario.dataset.price = String(precio);
+
+  aplicarExtras(tour.id); // fotos, itinerario, guía, etc. propios de este paquete
 }
 
 // Se espera a tener los datos para que galería, pestañas y formulario arranquen ya con el paquete correcto.
