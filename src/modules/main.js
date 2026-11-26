@@ -1,6 +1,7 @@
 import { initCatalogo } from "./views/catalogo.js";
 import { apiClient } from "./api/ApiClient.js";
 import { getAuthSession, hasAdminAccess } from "./auth/authState.js";
+import { cartCount } from "./cart.js";
 
 const authSession = getAuthSession();
 if (authSession?.token) apiClient.setToken(authSession.token);
@@ -23,7 +24,24 @@ if (authActions) {
     authActions.append(adminLink);
   }
 }
-
+/* Enlace al carrito con el número de reservas guardadas */
+const navList = document.querySelector(".site-nav__list");
+if (navList) {
+  const item = document.createElement("li");
+  const enlace = document.createElement("a");
+  enlace.className = "site-nav__link";
+  enlace.href = "carrito.html";
+  if (window.location.pathname.endsWith("carrito.html")) enlace.setAttribute("aria-current", "page");
+  const pintarCarrito = () => {
+    const n = cartCount();
+    enlace.textContent = n ? `Carrito (${n})` : "Carrito";
+  };
+  pintarCarrito();
+  window.addEventListener("cart:change", pintarCarrito);
+  window.addEventListener("storage", pintarCarrito);
+  item.append(enlace);
+  navList.append(item);
+}
 const toggle = document.querySelector(".nav-toggle");
 const menu = document.getElementById("menu-principal");
 
