@@ -12,6 +12,19 @@ class StoreReservaRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Si quien reserva es un cliente, su cliente_id sale de su sesión (token),
+     * no de lo que envíe el navegador.
+     */
+    protected function prepareForValidation(): void
+    {
+        $user = $this->user();
+
+        if ($user && $user->role === 'cliente' && $user->cliente) {
+            $this->merge(['cliente_id' => $user->cliente->id]);
+        }
+    }
+
     public function rules(): array
     {
         return [
@@ -26,7 +39,8 @@ class StoreReservaRequest extends FormRequest
              * @example 3
              */
             'salida_tour_id' => [
-                'required',
+                'required_without:tour_id',
+                'nullable',
                 'integer',
                 'exists:salida_tours,id',
                 Rule::unique('reservas', 'salida_tour_id')->where(function ($query) {
@@ -34,6 +48,19 @@ class StoreReservaRequest extends FormRequest
                                   ->where('estado', '!=', 'cancelada');
                 }),
             ],
+
+            /**
+             * Alternativa a `salida_tour_id`: id del tour a reservar. Junto con `fecha`,
+             * el servidor busca la salida de ese día o la programa si todavía no existe.
+             * @example 1
+             */
+            'tour_id' => ['required_without:salida_tour_id', 'nullable', 'integer', 'exists:tours,id'],
+
+            /**
+             * Día de la salida (AAAA-MM-DD). Obligatoria cuando se envía `tour_id`.
+             * @example "2026-11-27"
+             */
+            'fecha' => ['required_with:tour_id', 'nullable', 'date_format:Y-m-d', 'after_or_equal:today'],
 
             /**
              * Cantidad de personas (1 a 20). Desde 5 personas se aplica un 10 % de descuento.
@@ -56,7 +83,12 @@ class StoreReservaRequest extends FormRequest
             'cliente_id.integer' => 'El identificador del cliente debe ser numérico.',
             'cliente_id.exists' => 'El cliente indicado no existe.',
 
-            'salida_tour_id.required' => 'La salida del tour es obligatoria.',
+            'salida_tour_id.required_without' => 'Indica la salida del tour o el tour y la fecha.',
+            'tour_id.required_without' => 'Indica el tour o la salida del tour.',
+            'tour_id.exists' => 'El tour indicado no existe.',
+            'fecha.required_with' => 'La fecha de la salida es obligatoria.',
+            'fecha.date_format' => 'La fecha de la salida debe tener el formato AAAA-MM-DD.',
+            'fecha.after_or_equal' => 'La fecha de la salida debe ser hoy o posterior.',
             'salida_tour_id.integer' => 'El identificador de la salida del tour debe ser numérico.',
             'salida_tour_id.exists' => 'La salida del tour indicada no existe.',
             'salida_tour_id.unique' => 'Ya tienes una reserva activa para esta salida de tour.',

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\BusinessRuleException;
 use App\Models\Reserva;
 use App\Models\SalidaTour;
+use App\Models\Tour;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\AuthenticationException;
@@ -19,6 +20,9 @@ class ReservaService
     private const UMBRAL_DESCUENTO_PERSONAS = 5;
     private const PORCENTAJE_DESCUENTO = 0.10;
     private const ESTADOS_ACTIVOS = ['pendiente', 'confirmada'];
+    // Valores con los que se programa una salida cuando el cliente reserva un día que aún no tiene salida.
+    private const HORA_SALIDA_POR_DEFECTO = '09:00:00';
+    private const CUPO_SALIDA_POR_DEFECTO = 12;
 
     // Punto 6: listado con paginación, ordenamiento y filtros combinables
     public function list(?User $user, array $filters): LengthAwarePaginator
@@ -81,11 +85,12 @@ class ReservaService
 
         return DB::transaction(function () use ($data) {
             /** @var SalidaTour $salida */
-            $salida = SalidaTour::with('tour')
-                ->lockForUpdate()
-                ->findOrFail($data['salida_tour_id']);
+            $salida = !empty($data['salida_tour_id'])
+                ? SalidaTour::with('tour')->lockForUpdate()->findOrFail($data['salida_tour_id'])
+                : $this->resolverSalida((int) $data['tour_id'], (string) $data['fecha']);
 
             $this->verificarSalidaVigente($salida);
+            $this->verificarSinReservaActiva($data['cliente_id'], $salida);
             $this->verificarCupoDisponible($salida, $data['cantidad_personas']);
 
             $total = $this->calcularTotal(
@@ -95,7 +100,7 @@ class ReservaService
 
             return Reserva::create([
                 'cliente_id' => $data['cliente_id'],
-                'salida_tour_id' => $data['salida_tour_id'],
+                'salida_tour_id' => $salida->id,
                 'cantidad_personas' => $data['cantidad_personas'],
                 'fecha_reserva' => $data['fecha_reserva'],
                 'estado' => 'pendiente',
@@ -212,6 +217,54 @@ class ReservaService
         }
 
         $reserva->delete();
+    }
+
+    // Busca la salida del tour para ese día; si no existe, la programa con valores por defecto.
+    private function resolverSalida(int $tourId, string $fecha): SalidaTour
+    {
+        $tour = Tour::findOrFail($tourId);
+
+        if ($tour->estado !== 'activo') {
+            throw new BusinessRuleException(
+                'Este tour no está disponible para reservas.',
+                'TOUR_NO_DISPONIBLE'
+            );
+        }
+
+        $salida = SalidaTour::where('tour_id', $tour->id)
+            ->whereDate('fecha', $fecha)
+            ->where('estado', 'programada')
+            ->orderBy('hora')
+            ->lockForUpdate()
+            ->first();
+
+        if (!$salida) {
+            $salida = SalidaTour::create([
+                'tour_id' => $tour->id,
+                'fecha' => $fecha,
+                'hora' => self::HORA_SALIDA_POR_DEFECTO,
+                'cupo_maximo' => self::CUPO_SALIDA_POR_DEFECTO,
+                'estado' => 'programada',
+            ]);
+        }
+
+        return $salida->load('tour');
+    }
+
+    // Un cliente no puede tener dos reservas activas sobre la misma salida.
+    private function verificarSinReservaActiva(int $clienteId, SalidaTour $salida): void
+    {
+        $existe = Reserva::where('cliente_id', $clienteId)
+            ->where('salida_tour_id', $salida->id)
+            ->whereIn('estado', self::ESTADOS_ACTIVOS)
+            ->exists();
+
+        if ($existe) {
+            throw new BusinessRuleException(
+                'Ya tienes una reserva activa para esta salida de tour.',
+                'RESERVA_DUPLICADA'
+            );
+        }
     }
 
     // Punto 4, regla propia del dominio: no reservar una salida ya vencida

@@ -106,3 +106,35 @@
   gap: var(--space-md);
   margin-top: var(--space-lg);
 }
+
+/* Resultado de "Continuar con la reserva" */
+.cart-result {
+  margin-block: var(--space-md);
+  padding: var(--space-md);
+  border: 2px solid var(--color-success);
+  border-radius: var(--radius);
+  background: var(--color-white);
+}
+
+.cart-result[hidden] {
+  display: none;
+}
+
+.cart-result[data-error="true"] {
+  border-color: var(--color-error);
+}
+
+.cart-result__ok {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.cart-result__error {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.cart-result__list {
+  margin-block: var(--space-sm);
+  padding-left: 1.25rem;
+}

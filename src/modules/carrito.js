@@ -1,6 +1,7 @@
 /* Página del carrito: lista de reservas, cambio de personas, quitar y resumen. */
 import { getCart, setPersonas, removeItem, clearCart, calcular, MAX_PERSONAS } from "./cart.js";
-import { isAuthenticated, redirectToLogin } from "./auth/authState.js";
+import { isAuthenticated, getAuthSession, redirectToLogin } from "./auth/authState.js";
+import { apiClient, ApiError } from "./api/ApiClient.js";
 
 const formatoPrecio = new Intl.NumberFormat("es-CR", { maximumFractionDigits: 0 });
 const colones = (n) => `₡${formatoPrecio.format(Number(n) || 0)}`;
@@ -14,6 +15,8 @@ const lista = document.getElementById("carrito-lista");
 const vacio = document.getElementById("carrito-vacio");
 const resumen = document.getElementById("carrito-resumen");
 const estado = document.getElementById("carrito-estado");
+const confirmacion = document.getElementById("carrito-confirmacion");
+const botonContinuar = document.getElementById("carrito-continuar");
 
 const crear = (etiqueta, clase, texto) => {
   const el = document.createElement(etiqueta);
@@ -103,13 +106,112 @@ document.getElementById("carrito-vaciar")?.addEventListener("click", () => {
   if (window.confirm("¿Quitar todas las reservas del carrito?")) clearCart();
 });
 
-document.getElementById("carrito-continuar")?.addEventListener("click", () => {
+/* ---------- Continuar con la reserva: guarda cada línea del carrito en la base de datos (POST /api/reservas) ---------- */
+const hoyISO = () => {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
+function mensajeDeError(error) {
+  if (!(error instanceof ApiError)) return "Ocurrió un error inesperado.";
+  if (error.isConnectionError) return "No se pudo conectar con el servidor. Intenta de nuevo en un momento.";
+  if (error.status === 403) return "Tu cuenta no puede crear reservas. Ingresa con una cuenta de cliente.";
+  if (error.isValidationError && error.details) {
+    const primero = Object.values(error.details)[0];
+    return Array.isArray(primero) ? primero[0] : String(primero);
+  }
+  return error.message;
+}
+
+async function reservarItem(item, clienteId) {
+  if (!item.tourId || item.tourId === "ejemplo") {
+    throw new ApiError("Este paquete es solo de ejemplo y no se puede reservar.");
+  }
+  const cuerpo = {
+    tour_id: Number(item.tourId),
+    fecha: item.fecha, // AAAA-MM-DD: el servidor busca (o programa) la salida de ese día
+    cantidad_personas: item.personas,
+    fecha_reserva: hoyISO(),
+  };
+  if (clienteId) cuerpo.cliente_id = clienteId; // el servidor igual usa el cliente de la sesión
+  return apiClient.post("reservas", cuerpo);
+}
+
+function mostrarResultado({ creadas, fallidas }) {
+  const partes = [];
+
+  if (creadas.length) {
+    const p = crear("p", "cart-result__ok",
+      creadas.length === 1
+        ? "¡Reserva registrada! Quedó en estado pendiente."
+        : `¡${creadas.length} reservas registradas! Quedaron en estado pendiente.`);
+    partes.push(p);
+  }
+
+  if (fallidas.length) {
+    partes.push(crear("p", "cart-result__error",
+      fallidas.length === 1 ? "No se pudo reservar este paquete:" : "No se pudieron reservar estos paquetes:"));
+    const ul = crear("ul", "cart-result__list");
+    fallidas.forEach(({ item, mensaje }) => ul.append(crear("li", "", `${item.nombre} (${fechaCorta(item.fecha)}): ${mensaje}`)));
+    partes.push(ul);
+    partes.push(crear("p", "text-small", "Siguen en tu carrito para que puedas corregirlos y volver a intentar."));
+  }
+
+  confirmacion.replaceChildren(...partes);
+  confirmacion.dataset.error = String(fallidas.length > 0);
+  confirmacion.hidden = false;
+  confirmacion.scrollIntoView({ block: "nearest" });
+}
+
+let enviando = false;
+
+botonContinuar?.addEventListener("click", async () => {
+  if (enviando) return;
+
   if (!isAuthenticated()) {
     redirectToLogin({ returnTo: window.location.href });
     return;
   }
-  estado.textContent = "Tu carrito está listo. La confirmación final de las reservas todavía no está habilitada.";
-  estado.hidden = false;
+
+  const items = getCart();
+  if (items.length === 0) return;
+
+  enviando = true;
+  botonContinuar.disabled = true;
+  botonContinuar.textContent = "Reservando…";
+  confirmacion.hidden = true;
+
+  const clienteId = getAuthSession()?.usuario?.cliente_id;
+  const creadas = [];
+  const fallidas = [];
+  let sesionVencida = false;
+
+  for (const item of items) { // una por una, para saber cuál falló
+    try {
+      await reservarItem(item, clienteId);
+      creadas.push(item);
+    } catch (error) {
+      if (error instanceof ApiError && error.isUnauthorized) {
+        sesionVencida = true;
+        break;
+      }
+      fallidas.push({ item, mensaje: mensajeDeError(error) });
+    }
+  }
+
+  creadas.forEach((item) => removeItem(item.id)); // lo reservado sale del carrito
+  enviando = false;
+  botonContinuar.disabled = false;
+  botonContinuar.textContent = "Continuar con la reserva";
+
+  if (sesionVencida) {
+    if (creadas.length) mostrarResultado({ creadas, fallidas });
+    redirectToLogin({ returnTo: window.location.href });
+    return;
+  }
+
+  mostrarResultado({ creadas, fallidas });
 });
 
 window.addEventListener("cart:change", pintar);
